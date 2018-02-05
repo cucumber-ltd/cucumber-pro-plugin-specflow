@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +13,11 @@ namespace Cucumber.Pro.SpecFlowPlugin
     {
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters)
         {
+            runtimePluginEvents.ConfigurationDefaults += (sender, args) =>
+            {
+                args.SpecFlowConfiguration.AdditionalStepAssemblies.Add(
+                    GetType().Assembly.FullName);
+            };
         }
     }
 }
