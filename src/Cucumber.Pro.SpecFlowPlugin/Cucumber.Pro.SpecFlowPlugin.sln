@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cucumber.Pro.SpecFlowPlugin", "Cucumber.Pro.SpecFlowPlugin\Cucumber.Pro.SpecFlowPlugin.csproj", "{073873EF-7722-4E78-ACAB-2F5D27A73F90}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cucumber.Pro.SpecFlowPlugin.SampleProject", "..\tests\Cucumber.Pro.SpecFlowPlugin.SampleProject\Cucumber.Pro.SpecFlowPlugin.SampleProject.csproj", "{BA787E6A-31E3-4BB1-AB5A-3987BDAFC4FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{073873EF-7722-4E78-ACAB-2F5D27A73F90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{073873EF-7722-4E78-ACAB-2F5D27A73F90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{073873EF-7722-4E78-ACAB-2F5D27A73F90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA787E6A-31E3-4BB1-AB5A-3987BDAFC4FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA787E6A-31E3-4BB1-AB5A-3987BDAFC4FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA787E6A-31E3-4BB1-AB5A-3987BDAFC4FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA787E6A-31E3-4BB1-AB5A-3987BDAFC4FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
