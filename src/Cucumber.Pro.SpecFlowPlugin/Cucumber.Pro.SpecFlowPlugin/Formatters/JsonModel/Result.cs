@@ -1,3 +1,6 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace Cucumber.Pro.SpecFlowPlugin.Formatters.JsonModel
 {
     public class Result

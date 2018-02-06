@@ -3,6 +3,7 @@ using System.Linq;
 using Cucumber.Pro.SpecFlowPlugin.Events;
 using Cucumber.Pro.SpecFlowPlugin.Formatters.JsonModel;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Tracing;
@@ -22,6 +23,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
         public void SetEventPublisher(IEventPublisher publisher)
         {
+            publisher.RegisterHandlerFor(new RuntimeEventHandler<ScenarioStartedEvent>(OnScenarioStarted));
             publisher.RegisterHandlerFor(new RuntimeEventHandler<StepFinishedEvent>(OnStepFinished));
 
             //HACK: temporary hack
@@ -30,16 +32,29 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             _featureResults.Add(featureResult);
         }
 
+        private void OnScenarioStarted(ScenarioStartedEvent e)
+        {
+            var featureResult = _featureResults.Last();
+
+            var testCaseResult = new TestCaseResult
+            {
+                Line = 9, //TODO
+                Name = e.ScenarioContext.ScenarioInfo.Title,
+                Type = "scenario" //TODO
+            };
+            featureResult.TestCaseResults.Add(testCaseResult);
+        }
+
         private void OnStepFinished(StepFinishedEvent e)
         {
             var featureResult = _featureResults.Last();
             var testCaseResult = featureResult.TestCaseResults.Last();
 
-            var stepResult = new StepResult()
+            var stepResult = new StepResult
             {
                 Keyword = e.StepContext.StepInfo.StepInstance.Keyword,
                 Name = e.StepContext.StepInfo.Text,
-                Result = new Result()
+                Result = new Result
                 {
                     Duration = 1234, //TODO
                     Status = e.ScenarioContext.TestError == null ? ResultStatus.Passed : ResultStatus.Unknown
@@ -55,6 +70,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
         {
             var serializerSettings = new JsonSerializerSettings();
             serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            serializerSettings.Converters = new List<JsonConverter> {new StringEnumConverter {CamelCaseText = true}};
             serializerSettings.Formatting = Formatting.Indented;
 
             return JsonConvert.SerializeObject(_featureResults, serializerSettings);

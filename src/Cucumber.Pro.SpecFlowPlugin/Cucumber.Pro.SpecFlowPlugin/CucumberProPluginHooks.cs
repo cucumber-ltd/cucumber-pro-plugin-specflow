@@ -33,7 +33,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
         [BeforeScenario]
         public void BeforeScenario()
         {
-            _eventPublisher.Send(new ScenarioStartedEvent());
+            _eventPublisher.Send(new ScenarioStartedEvent(_contextManager.ScenarioContext));
         }
 
         [AfterStep]
