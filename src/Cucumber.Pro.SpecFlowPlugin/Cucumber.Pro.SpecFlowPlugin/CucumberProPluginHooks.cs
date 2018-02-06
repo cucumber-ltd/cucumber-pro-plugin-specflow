@@ -30,10 +30,16 @@ namespace Cucumber.Pro.SpecFlowPlugin
             jsonFormatter.SetEventPublisher(eventPublisher);
         }
 
+        [BeforeFeature]
+        public static void BeforeFeature(EventPublisher eventPublisher, FeatureContext featureContext)
+        {
+            eventPublisher.Send(new FeatureStartedEvent(featureContext));
+        }
+
         [BeforeScenario]
         public void BeforeScenario()
         {
-            _eventPublisher.Send(new ScenarioStartedEvent(_contextManager.ScenarioContext));
+            _eventPublisher.Send(new ScenarioStartedEvent(_contextManager.ScenarioContext, _contextManager.FeatureContext));
         }
 
         [AfterStep]

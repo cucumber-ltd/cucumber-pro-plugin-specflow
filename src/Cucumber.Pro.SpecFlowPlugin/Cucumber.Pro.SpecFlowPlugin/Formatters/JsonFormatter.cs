@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Cucumber.Pro.SpecFlowPlugin.Events;
 using Cucumber.Pro.SpecFlowPlugin.Formatters.JsonModel;
@@ -16,6 +17,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
     {
         private readonly ITraceListener _traceListener;
         private readonly List<FeatureResult> _featureResults = new List<FeatureResult>();
+        private FeatureResult _currentFeatureResult = null;
 
         public JsonFormatter(ITraceListener traceListener)
         {
@@ -24,16 +26,32 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
         public void SetEventPublisher(IEventPublisher publisher)
         {
+            publisher.RegisterHandlerFor(new RuntimeEventHandler<FeatureStartedEvent>(OnFeatureStarted));
             publisher.RegisterHandlerFor(new RuntimeEventHandler<ScenarioStartedEvent>(OnScenarioStarted));
             publisher.RegisterHandlerFor(new RuntimeEventHandler<StepFinishedEvent>(OnStepFinished));
+        }
 
-            //HACK: temporary hack
-            _featureResults.Add(new FeatureResult());
+        private void OnFeatureStarted(FeatureStartedEvent e)
+        {
+            _currentFeatureResult = null; // this triggers feature initialization in OnScenarioStarted
         }
 
         private void OnScenarioStarted(ScenarioStartedEvent e)
         {
-            var featureResult = _featureResults.Last();
+            if (_currentFeatureResult == null)
+            {
+                var featureFileFrame = GetFeatureFileFrame();
+                var featureFile = featureFileFrame?.GetFileName() ?? "Unknown.feature";
+                //TODO: make path relative to Git root
+
+                _currentFeatureResult = new FeatureResult
+                {
+                    Uri = featureFile.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                    Name = e.FeatureContext.FeatureInfo.Title
+                };
+
+                _featureResults.Add(_currentFeatureResult);
+            }
 
             var testCaseResult = new TestCaseResult
             {
@@ -41,16 +59,22 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
                 Name = e.ScenarioContext.ScenarioInfo.Title,
                 Type = "scenario" //TODO
             };
-            featureResult.TestCaseResults.Add(testCaseResult);
+            _currentFeatureResult.TestCaseResults.Add(testCaseResult);
         }
 
         private static int GetFeatureFileLine()
         {
+            var featureFileFrame = GetFeatureFileFrame();
+            var line = featureFileFrame?.GetFileLineNumber() ?? 0;
+            return line;
+        }
+
+        private static StackFrame GetFeatureFileFrame()
+        {
             var stackTrace = new StackTrace(true);
             var featureFileFrame = stackTrace.GetFrames()?.FirstOrDefault(
                 f => f.GetFileName()?.EndsWith(".feature") ?? false);
-            var line = featureFileFrame?.GetFileLineNumber() ?? 0;
-            return line;
+            return featureFileFrame;
         }
 
         private void OnStepFinished(StepFinishedEvent e)

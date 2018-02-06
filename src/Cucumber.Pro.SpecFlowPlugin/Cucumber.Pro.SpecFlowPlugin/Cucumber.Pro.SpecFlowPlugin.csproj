@@ -49,6 +49,7 @@
     <Compile Include="CucumberProPlugin.cs" />
     <Compile Include="CucumberProPluginHooks.cs" />
     <Compile Include="Events\EventPublisher.cs" />
+    <Compile Include="Events\FeatureStartedEvent.cs" />
     <Compile Include="Events\IEventPublisher.cs" />
     <Compile Include="Events\RuntimeEvent.cs" />
     <Compile Include="Events\RuntimeEventHandler.cs" />
