@@ -65,7 +65,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
                 Name = e.StepContext.StepInfo.Text,
                 Result = new Result
                 {
-                    Duration = 1234, //TODO
+                    Duration = 0, //TODO
                     Status = e.ScenarioContext.TestError == null ? ResultStatus.Passed : ResultStatus.Failed,
                     ErrorMessage = e.ScenarioContext.TestError?.ToString()
                         //TODO: max length of error message
