@@ -66,7 +66,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
                 Result = new Result
                 {
                     Duration = 1234, //TODO
-                    Status = e.ScenarioContext.TestError == null ? ResultStatus.Passed : ResultStatus.Unknown
+                    Status = e.ScenarioContext.TestError == null ? ResultStatus.Passed : ResultStatus.Failed,
+                    ErrorMessage = e.ScenarioContext.TestError?.ToString()
+                        //TODO: max length of error message
                 }
             };
             testCaseResult.StepResults.Add(stepResult);
@@ -80,6 +82,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             serializerSettings.Converters = new List<JsonConverter> {new StringEnumConverter {CamelCaseText = true}};
             serializerSettings.Formatting = Formatting.Indented;
+            serializerSettings.NullValueHandling = NullValueHandling.Ignore;
 
             return JsonConvert.SerializeObject(_featureResults, serializerSettings);
         }
