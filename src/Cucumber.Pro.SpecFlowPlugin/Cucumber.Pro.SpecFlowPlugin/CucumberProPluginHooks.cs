@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using Cucumber.Pro.SpecFlowPlugin.Events;
 using Cucumber.Pro.SpecFlowPlugin.Formatters;
+using Cucumber.Pro.SpecFlowPlugin.Publishing;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Infrastructure;
 using TechTalk.SpecFlow.Tracing;
@@ -53,8 +54,11 @@ namespace Cucumber.Pro.SpecFlowPlugin
         {
             var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
             Debug.Assert(assemblyFolder != null);
-            File.WriteAllText(
-                Path.Combine(assemblyFolder, "result.json"), jsonFormatter.GetJson());
+            var path = Path.Combine(assemblyFolder, "result.json");
+            File.WriteAllText(path, jsonFormatter.GetJson());
+
+            var publisher = new ResultsPublisher();
+            publisher.PublishResults(path);
         }
     }
 }
