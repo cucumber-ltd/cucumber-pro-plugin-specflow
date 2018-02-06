@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Cucumber.Pro.SpecFlowPlugin.Events;
 using Cucumber.Pro.SpecFlowPlugin.Formatters.JsonModel;
@@ -12,7 +14,6 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 {
     public class JsonFormatter : IFormatter
     {
-        private int _stepFinishedCount = 0;
         private readonly ITraceListener _traceListener;
         private readonly List<FeatureResult> _featureResults = new List<FeatureResult>();
 
@@ -27,9 +28,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             publisher.RegisterHandlerFor(new RuntimeEventHandler<StepFinishedEvent>(OnStepFinished));
 
             //HACK: temporary hack
-            var featureResult = new FeatureResult();
-            featureResult.TestCaseResults.Add(new TestCaseResult());
-            _featureResults.Add(featureResult);
+            _featureResults.Add(new FeatureResult());
         }
 
         private void OnScenarioStarted(ScenarioStartedEvent e)
@@ -38,11 +37,20 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
             var testCaseResult = new TestCaseResult
             {
-                Line = 9, //TODO
+                Line = GetFeatureFileLine(), 
                 Name = e.ScenarioContext.ScenarioInfo.Title,
                 Type = "scenario" //TODO
             };
             featureResult.TestCaseResults.Add(testCaseResult);
+        }
+
+        private static int GetFeatureFileLine()
+        {
+            var stackTrace = new StackTrace(true);
+            var featureFileFrame = stackTrace.GetFrames()?.FirstOrDefault(
+                f => f.GetFileName()?.EndsWith(".feature") ?? false);
+            var line = featureFileFrame?.GetFileLineNumber() ?? 0;
+            return line;
         }
 
         private void OnStepFinished(StepFinishedEvent e)
@@ -52,6 +60,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
             var stepResult = new StepResult
             {
+                Line = GetFeatureFileLine(),
                 Keyword = e.StepContext.StepInfo.StepInstance.Keyword,
                 Name = e.StepContext.StepInfo.Text,
                 Result = new Result
@@ -62,8 +71,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             };
             testCaseResult.StepResults.Add(stepResult);
 
-            _stepFinishedCount++;
-            _traceListener.WriteToolOutput($"JsonFormatter: Step Finished ({_stepFinishedCount})");
+            _traceListener.WriteToolOutput($"JsonFormatter: Step Finished");
         }
 
         public string GetJson()
