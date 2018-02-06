@@ -43,6 +43,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
                 var featureFileFrame = GetFeatureFileFrame();
                 var featureFile = featureFileFrame?.GetFileName() ?? "Unknown.feature";
                 //TODO: make path relative to Git root
+                int hack_srcIndex = featureFile.IndexOf("src", StringComparison.InvariantCultureIgnoreCase);
+                if (hack_srcIndex >= 0)
+                    featureFile = featureFile.Substring(hack_srcIndex);
 
                 _currentFeatureResult = new FeatureResult
                 {
