@@ -61,7 +61,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="Configuration\ConfigTests.cs" />
     <Compile Include="Configuration\Loaders\ConfigLoaderContract.cs" />
     <Compile Include="Configuration\Loaders\EnvironmentVariablesConfigLoaderTests.cs" />
