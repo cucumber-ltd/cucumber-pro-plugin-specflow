@@ -46,6 +46,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\NullValue.cs" />
+    <Compile Include="Configuration\RealValue.cs" />
+    <Compile Include="Configuration\Value.cs" />
     <Compile Include="CucumberProPlugin.cs" />
     <Compile Include="CucumberProPluginHooks.cs" />
     <Compile Include="Events\EventPublisher.cs" />
@@ -69,5 +73,6 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
