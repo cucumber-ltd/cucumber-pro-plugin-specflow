@@ -52,6 +52,7 @@
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\ConfigDefaults.cs" />
     <Compile Include="Configuration\ConfigFactory.cs" />
+    <Compile Include="Configuration\Loaders\EnvironmentVariablesConfigLoader.cs" />
     <Compile Include="Configuration\Loaders\IConfigLoader.cs" />
     <Compile Include="Configuration\Loaders\YamlConfigLoader.cs" />
     <Compile Include="Configuration\NullValue.cs" />

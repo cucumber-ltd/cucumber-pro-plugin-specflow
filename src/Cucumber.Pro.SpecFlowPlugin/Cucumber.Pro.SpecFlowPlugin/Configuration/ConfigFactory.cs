@@ -43,10 +43,10 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
             // to define global values, but equally easy to override them on a per-project
             // basis.
             LoadYamlConfigFiles(GLOBAL_YAML_FILE_NAMES, config);
-            //new EnvironmentVariablesConfigLoader().load(config);
-            //new BambooEnvironmentVariablesConfigLoader().load(config);
-            //new DeprecatedEnvironmentVariablesConfigLoader().load(config);
-            //new SystemPropertiesConfigLoader().load(config);
+            new EnvironmentVariablesConfigLoader().Load(config);
+            //new BambooEnvironmentVariablesConfigLoader().Load(config);
+            //new DeprecatedEnvironmentVariablesConfigLoader().Load(config);
+            //new SystemPropertiesConfigLoader().Load(config);
             LoadYamlConfigFiles(LOCAL_YAML_FILE_NAMES, config);
 
             return config;

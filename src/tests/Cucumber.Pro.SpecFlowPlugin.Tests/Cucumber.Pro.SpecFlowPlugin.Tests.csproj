@@ -64,6 +64,7 @@
     <Compile Include="Class1.cs" />
     <Compile Include="Configuration\ConfigTests.cs" />
     <Compile Include="Configuration\Loaders\ConfigLoaderContract.cs" />
+    <Compile Include="Configuration\Loaders\EnvironmentVariablesConfigLoaderTests.cs" />
     <Compile Include="Configuration\Loaders\YamlConfigLoaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
