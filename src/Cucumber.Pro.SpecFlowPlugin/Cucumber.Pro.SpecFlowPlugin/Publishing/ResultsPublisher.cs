@@ -19,7 +19,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
                 new AuthenticationHeaderValue("Basic",
                     Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes("fe3e1a5f27789a139a963ff56cddb00816c" + ":")));
             var content = new MultipartFormDataContent();
-            content.Add(new StringContent("env1=envval"), "env", "env.txt");
+            content.Add(new StringContent(@"cucumber_pro_build_reference=build123
+cucumber_pro_git_branch=master
+".Replace("\r\n", "\n")), "env", "env.txt");
             content.Add(new StringContent("default"), "profileName");
             content.Add(new StringContent(resultsJson, Encoding.UTF8,
                 "application/x.cucumber.java.results+json"), "payload", "results.json");
