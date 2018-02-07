@@ -44,9 +44,14 @@
     <Reference Include="TechTalk.SpecFlow, Version=2.2.0.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL">
       <HintPath>..\packages\SpecFlow.2.2.1\lib\net45\TechTalk.SpecFlow.dll</HintPath>
     </Reference>
+    <Reference Include="YamlDotNet, Version=4.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.4.3.0\lib\net45\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\Loaders\IConfigLoader.cs" />
+    <Compile Include="Configuration\Loaders\YamlConfigLoader.cs" />
     <Compile Include="Configuration\NullValue.cs" />
     <Compile Include="Configuration\RealValue.cs" />
     <Compile Include="Configuration\Value.cs" />

@@ -29,6 +29,11 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
             return GetIn(Normalize(key), true).IsNull();
         }
 
+        public void SetNull(string key)
+        {
+            SetIn(Normalize(key), new NullValue());
+        }
+
         public void Set(string key, string value)
         {
             SetIn(Normalize(key), RealValue.FromString(value));
@@ -121,8 +126,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
             {
                 stringBuilder.Append(indent);
                 stringBuilder.Append(item.Key);
-                stringBuilder.Append(": ");
-                stringBuilder.Append(item.Value.IsNull() ? "" : item.Value.GetString());
+                stringBuilder.Append(":");
+                stringBuilder.Append(item.Value.IsNull() ? "" : " " + item.Value.GetString());
                 stringBuilder.AppendLine();
             }
             foreach (var configItem in _configByProperty)
