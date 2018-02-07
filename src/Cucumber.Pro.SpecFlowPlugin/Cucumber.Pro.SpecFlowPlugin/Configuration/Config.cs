@@ -44,6 +44,11 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
             SetIn(Normalize(key), RealValue.FromBoolean(value));
         }
 
+        public void Set(string key, int value)
+        {
+            SetIn(Normalize(key), RealValue.FromInteger(value));
+        }
+
         private void SetValue(string property, IValue value)
         {
             _valueByProperty[property.ToLowerInvariant()] = value;
