@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using BoDi;
 using Cucumber.Pro.SpecFlowPlugin.Events;
 using Cucumber.Pro.SpecFlowPlugin.Formatters;
 using Cucumber.Pro.SpecFlowPlugin.Publishing;
@@ -14,15 +11,17 @@ namespace Cucumber.Pro.SpecFlowPlugin
 {
     public class JsonReporter : IFormatter
     {
-        private readonly JsonFormatter _jsonFormatter;
+        private readonly IObjectContainer _objectContainer;
+        private JsonFormatter _jsonFormatter;
 
-        public JsonReporter(JsonFormatter jsonFormatter)
+        public JsonReporter(IObjectContainer objectContainer)
         {
-            _jsonFormatter = jsonFormatter;
+            _objectContainer = objectContainer;
         }
 
         public void SetEventPublisher(IEventPublisher publisher)
         {
+            _jsonFormatter = _objectContainer.Resolve<JsonFormatter>();
             _jsonFormatter.SetEventPublisher(publisher);
 
             publisher.RegisterHandlerFor<TestRunFinishedEvent>(OnTestRunFinished);

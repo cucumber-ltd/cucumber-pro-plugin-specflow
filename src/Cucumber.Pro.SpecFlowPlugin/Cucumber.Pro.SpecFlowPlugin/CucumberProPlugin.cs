@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cucumber.Pro.SpecFlowPlugin;
+﻿using Cucumber.Pro.SpecFlowPlugin;
 using Cucumber.Pro.SpecFlowPlugin.Configuration;
+using Cucumber.Pro.SpecFlowPlugin.Formatters;
 using TechTalk.SpecFlow.Plugins;
 
 [assembly: RuntimePlugin(typeof(CucumberProPlugin))]
@@ -17,6 +14,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
             runtimePluginEvents.RegisterGlobalDependencies += (sender, args) =>
             {
                 args.ObjectContainer.RegisterFactoryAs(ConfigFactory.Create);
+                args.ObjectContainer.RegisterTypeAs<JsonReporter, IFormatter>("cpro");
             };
 
             runtimePluginEvents.ConfigurationDefaults += (sender, args) =>

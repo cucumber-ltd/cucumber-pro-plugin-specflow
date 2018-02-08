@@ -59,7 +59,7 @@
     <Compile Include="Configuration\RealValue.cs" />
     <Compile Include="Configuration\Value.cs" />
     <Compile Include="CucumberProPlugin.cs" />
-    <Compile Include="CucumberProPluginHooks.cs" />
+    <Compile Include="Events\EventPublisherHooks.cs" />
     <Compile Include="Events\EventPublisher.cs" />
     <Compile Include="Events\FeatureStartedEvent.cs" />
     <Compile Include="Events\IEventPublisher.cs" />

@@ -1,34 +1,28 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-using Cucumber.Pro.SpecFlowPlugin.Events;
+﻿using System.Collections.Generic;
 using Cucumber.Pro.SpecFlowPlugin.Formatters;
-using Cucumber.Pro.SpecFlowPlugin.Publishing;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Infrastructure;
-using TechTalk.SpecFlow.Tracing;
 
-namespace Cucumber.Pro.SpecFlowPlugin
+namespace Cucumber.Pro.SpecFlowPlugin.Events
 {
     [Binding]
-    public class CucumberProPluginHooks
+    public class EventPublisherHooks
     {
-        private readonly ITraceListener _traceListener;
         private readonly EventPublisher _eventPublisher;
         private readonly IContextManager _contextManager;
 
-        public CucumberProPluginHooks(ITraceListener traceListener, EventPublisher eventPublisher, IContextManager contextManager)
+        public EventPublisherHooks(EventPublisher eventPublisher, IContextManager contextManager)
         {
-            _traceListener = traceListener;
             _eventPublisher = eventPublisher;
             _contextManager = contextManager;
         }
 
         [BeforeTestRun]
-        public static void SetupPlugin(JsonReporter jsonReporter, EventPublisher eventPublisher)
+        public static void SetupPlugin(IDictionary<string, IFormatter> formatters, EventPublisher eventPublisher)
         {
-            jsonReporter.SetEventPublisher(eventPublisher);
+            foreach (var formatter in formatters.Values)
+                formatter.SetEventPublisher(eventPublisher);
+
             eventPublisher.Send(new TestRunStartedEvent());
         }
 
