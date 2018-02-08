@@ -36,7 +36,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
 
         public static Config Create()
         {
-            var config = ConfigDefaults.CreateConfig();
+            var config = ConfigKeys.CreateDefaultConfig();
 
             // The order is defined by "globalness". The principle is to make it easy
             // to define global values, but equally easy to override them on a per-project

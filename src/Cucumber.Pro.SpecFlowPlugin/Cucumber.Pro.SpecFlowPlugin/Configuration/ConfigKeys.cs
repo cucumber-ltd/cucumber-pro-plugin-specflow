@@ -1,6 +1,6 @@
 ﻿namespace Cucumber.Pro.SpecFlowPlugin.Configuration
 {
-    public static class ConfigDefaults
+    public static class ConfigKeys
     {
         public const string CUCUMBERPRO_URL = "cucumberpro.url";
         public const string CUCUMBERPRO_TOKEN = "cucumberpro.token";
@@ -18,14 +18,14 @@
         // https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables
         public const string TRAVIS_REPO_SLUG = "TRAVIS_REPO_SLUG";
 
-        public static Config CreateConfig()
+        public static Config CreateDefaultConfig()
         {
             var config = new Config();
             config.SetNull(CUCUMBERPRO_TOKEN);
             config.Set(CUCUMBERPRO_URL, "https://app.cucumber.pro/");
             config.Set(CUCUMBERPRO_CONNECTION_IGNOREERROR, true);
             config.Set(CUCUMBERPRO_CONNECTION_TIMEOUT, 5000);
-            config.Set(CUCUMBERPRO_ENVMASK, "SECRET|KEY|TOKEN|PASSWORD");
+            config.Set(CUCUMBERPRO_ENVMASK, "SECRET|KEY|TOKEN|PASSWORD|PWD");
             config.Set(CUCUMBERPRO_LOGGING, "WARN");
 
             config.SetNull(CUCUMBERPRO_PROJECTNAME);

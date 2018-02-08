@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\Config.cs" />
-    <Compile Include="Configuration\ConfigDefaults.cs" />
+    <Compile Include="Configuration\ConfigKeys.cs" />
     <Compile Include="Configuration\ConfigFactory.cs" />
     <Compile Include="Configuration\Loaders\EnvironmentVariablesConfigLoader.cs" />
     <Compile Include="Configuration\Loaders\IConfigLoader.cs" />
@@ -59,6 +59,7 @@
     <Compile Include="Configuration\RealValue.cs" />
     <Compile Include="Configuration\Value.cs" />
     <Compile Include="CucumberProPlugin.cs" />
+    <Compile Include="EnvironmentSettings\EnvFilter.cs" />
     <Compile Include="Events\EventPublisherHooks.cs" />
     <Compile Include="Events\EventPublisher.cs" />
     <Compile Include="Events\FeatureStartedEvent.cs" />
