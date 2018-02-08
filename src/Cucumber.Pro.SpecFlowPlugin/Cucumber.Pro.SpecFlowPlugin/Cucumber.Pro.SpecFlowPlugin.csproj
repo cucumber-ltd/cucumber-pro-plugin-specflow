@@ -60,6 +60,7 @@
     <Compile Include="Configuration\Value.cs" />
     <Compile Include="CucumberProPlugin.cs" />
     <Compile Include="EnvironmentSettings\EnvFilter.cs" />
+    <Compile Include="EnvironmentSettings\EnvHelper.cs" />
     <Compile Include="Events\EventPublisherHooks.cs" />
     <Compile Include="Events\EventPublisher.cs" />
     <Compile Include="Events\FeatureStartedEvent.cs" />

@@ -4,20 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Configuration.Loaders
 {
     public class EnvironmentVariablesConfigLoader : IConfigLoader
     {
-        private readonly Dictionary<string, string> _variables;
+        private readonly IDictionary<string, string> _variables;
 
-        public EnvironmentVariablesConfigLoader() : this(Environment.GetEnvironmentVariables()
-            .OfType<DictionaryEntry>()
-            .ToDictionary(i => i.Key.ToString(), i => i.Value?.ToString()))
+        public EnvironmentVariablesConfigLoader() : this(EnvHelper.GetEnvironmentVariables())
         {
         }
 
-        public EnvironmentVariablesConfigLoader(Dictionary<string, string> variables)
+        public EnvironmentVariablesConfigLoader(IDictionary<string, string> variables)
         {
             _variables = variables;
         }

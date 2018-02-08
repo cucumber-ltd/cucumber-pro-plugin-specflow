@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -8,7 +9,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
 {
     public class ResultsPublisher
     {
-        public void PublishResults(string resultsJsonFilePath)
+        public void PublishResults(string resultsJsonFilePath, IDictionary<string, string> env, string profileName)
         {
             var resultsJson = File.ReadAllText(resultsJsonFilePath);
 
@@ -22,7 +23,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             content.Add(new StringContent(@"cucumber_pro_build_reference=build123
 cucumber_pro_git_branch=master
 ".Replace("\r\n", "\n")), "env", "env.txt");
-            content.Add(new StringContent("default"), "profileName");
+            content.Add(new StringContent("default"), profileName);
             content.Add(new StringContent(resultsJson, Encoding.UTF8,
                 "application/x.cucumber.java.results+json"), "payload", "results.json");
             var response = httpClient
