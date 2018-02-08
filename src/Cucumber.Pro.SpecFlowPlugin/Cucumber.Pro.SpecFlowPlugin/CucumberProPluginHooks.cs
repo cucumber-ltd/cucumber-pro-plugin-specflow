@@ -26,9 +26,10 @@ namespace Cucumber.Pro.SpecFlowPlugin
         }
 
         [BeforeTestRun]
-        public static void SetupPlugin(JsonFormatter jsonFormatter, EventPublisher eventPublisher)
+        public static void SetupPlugin(JsonReporter jsonReporter, EventPublisher eventPublisher)
         {
-            jsonFormatter.SetEventPublisher(eventPublisher);
+            jsonReporter.SetEventPublisher(eventPublisher);
+            eventPublisher.Send(new TestRunStartedEvent());
         }
 
         [BeforeFeature]
@@ -50,15 +51,9 @@ namespace Cucumber.Pro.SpecFlowPlugin
         }
 
         [AfterTestRun]
-        public static void AfterTestRun(JsonFormatter jsonFormatter)
+        public static void AfterTestRun(EventPublisher eventPublisher, JsonFormatter jsonFormatter)
         {
-            var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
-            Debug.Assert(assemblyFolder != null);
-            var path = Path.Combine(assemblyFolder, "result.json");
-            File.WriteAllText(path, jsonFormatter.GetJson());
-
-            var publisher = new ResultsPublisher();
-            publisher.PublishResults(path);
+            eventPublisher.Send(new TestRunFinishedEvent());
         }
     }
 }
