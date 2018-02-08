@@ -6,17 +6,16 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
 {
     public class ConfigFactory
     {
+        public const string CONFIG_FILE_NAME = ".cucumberpro.yml";
+
         public static readonly string[] GLOBAL_YAML_FILE_NAMES = {
-            "/usr/local/etc/cucumber/cucumber.yml",
-            Environment.GetEnvironmentVariable("HOMEPATH") + "/.cucumber.yml",
+            Path.Combine(Environment.GetEnvironmentVariable("HOMEPATH"), CONFIG_FILE_NAME)
         };
 
         public static readonly string[] LOCAL_YAML_FILE_NAMES = {
-            "cucumber.yml",
-            ".cucumber.yml",
-            ".cucumber/cucumber.yml",
-            ".cucumber/cucumber.yml",
-            ".cucumberpro.yml"
+            Path.Combine("..", "..", CONFIG_FILE_NAME),
+            Path.Combine("..", CONFIG_FILE_NAME),
+            CONFIG_FILE_NAME
         };
 
 

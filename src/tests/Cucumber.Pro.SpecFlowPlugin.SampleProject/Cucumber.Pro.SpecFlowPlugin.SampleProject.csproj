@@ -72,6 +72,7 @@
     <Compile Include="XUnitTraceListener.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".cucumberpro.yml" />
     <None Include="App.config" />
     <None Include="Features\EatingCucumbers.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
