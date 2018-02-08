@@ -26,10 +26,10 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
         public void PublishResults(string resultsJsonFilePath, IDictionary<string, string> env, string profileName)
         {
             var resultsJson = File.ReadAllText(resultsJsonFilePath);
-            PublishResultsFromContent(env, profileName, resultsJson);
+            PublishResultsFromContent(resultsJson, env, profileName);
         }
 
-        private void PublishResultsFromContent(IDictionary<string, string> env, string profileName, string resultsJson)
+        private void PublishResultsFromContent(string resultsJson, IDictionary<string, string> env, string profileName)
         {
             var httpClient = new HttpClient();
 
