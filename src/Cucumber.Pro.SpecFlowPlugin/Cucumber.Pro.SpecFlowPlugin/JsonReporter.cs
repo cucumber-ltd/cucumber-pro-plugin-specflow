@@ -11,28 +11,28 @@ namespace Cucumber.Pro.SpecFlowPlugin
 {
     public class JsonReporter : IFormatter
     {
-        private readonly IObjectContainer _objectContainer;
-        private JsonFormatter _jsonFormatter;
+        private readonly Lazy<JsonFormatter> _jsonFormatter;
 
         public JsonReporter(IObjectContainer objectContainer)
         {
-            _objectContainer = objectContainer;
+            // We cannot depend on the JsonFormatter directly, because it also implements IFormatter
+            // and causes "Collection was modified" error when SpecFlow resolves all IFormatters
+            _jsonFormatter = new Lazy<JsonFormatter>(objectContainer.Resolve<JsonFormatter>, true);
         }
 
         public void SetEventPublisher(IEventPublisher publisher)
         {
-            _jsonFormatter = _objectContainer.Resolve<JsonFormatter>();
-            _jsonFormatter.SetEventPublisher(publisher);
+            _jsonFormatter.Value.SetEventPublisher(publisher);
 
             publisher.RegisterHandlerFor<TestRunFinishedEvent>(OnTestRunFinished);
         }
 
-        private void OnTestRunFinished(TestRunFinishedEvent runtimeevent)
+        private void OnTestRunFinished(TestRunFinishedEvent e)
         {
             var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
             Debug.Assert(assemblyFolder != null);
             var path = Path.Combine(assemblyFolder, "result.json");
-            File.WriteAllText(path, _jsonFormatter.GetJson());
+            File.WriteAllText(path, _jsonFormatter.Value.GetJson());
 
             var publisher = new ResultsPublisher();
             publisher.PublishResults(path);
