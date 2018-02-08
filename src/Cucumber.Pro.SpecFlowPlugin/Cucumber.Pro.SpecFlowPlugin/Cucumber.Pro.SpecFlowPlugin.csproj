@@ -80,7 +80,11 @@
     <Compile Include="Formatters\JsonModel\TestCaseResult.cs" />
     <Compile Include="JsonReporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Publishing\ResultsPublisher.cs" />
+    <Compile Include="Publishing\CucumberProResultsUrlBuilder.cs" />
+    <Compile Include="Publishing\HttpMultipartResultsPublisher.cs" />
+    <Compile Include="Publishing\IResultsPublisher.cs" />
+    <Compile Include="Publishing\NullResultsPublisher.cs" />
+    <Compile Include="Publishing\ResultsPublisherFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -16,6 +16,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
     {
         private readonly Lazy<JsonFormatter> _jsonFormatter;
         private readonly IDictionary<string, string> _filteredEnv;
+        private readonly IResultsPublisher _resultsPublisher;
 
         public JsonReporter(Config config, EnvFilter envFilter, IObjectContainer objectContainer)
         {
@@ -24,6 +25,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
             _jsonFormatter = new Lazy<JsonFormatter>(objectContainer.Resolve<JsonFormatter>, true);
 
             _filteredEnv = envFilter.Filter(EnvHelper.GetEnvironmentVariables());
+            _resultsPublisher = ResultsPublisherFactory.Create(config);
         }
 
         public void SetEventPublisher(IEventPublisher publisher)
@@ -40,8 +42,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
             var path = Path.Combine(assemblyFolder, "result.json");
             File.WriteAllText(path, _jsonFormatter.Value.GetJson());
 
-            var publisher = new ResultsPublisher();
-            publisher.PublishResults(path, _filteredEnv, "default");
+            _resultsPublisher.PublishResults(path, _filteredEnv, "default");
         }
     }
 }

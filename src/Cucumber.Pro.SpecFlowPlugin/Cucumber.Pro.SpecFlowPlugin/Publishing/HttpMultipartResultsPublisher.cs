@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Publishing
 {
-    public class ResultsPublisher
+    public class HttpMultipartResultsPublisher : IResultsPublisher
     {
         public void PublishResults(string resultsJsonFilePath, IDictionary<string, string> env, string profileName)
         {
