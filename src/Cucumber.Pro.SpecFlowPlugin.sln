@@ -5,13 +5,13 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cucumber.Pro.SpecFlowPlugin", "Cucumber.Pro.SpecFlowPlugin\Cucumber.Pro.SpecFlowPlugin.csproj", "{073873EF-7722-4E78-ACAB-2F5D27A73F90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cucumber.Pro.SpecFlowPlugin.SampleProject", "..\tests\Cucumber.Pro.SpecFlowPlugin.SampleProject\Cucumber.Pro.SpecFlowPlugin.SampleProject.csproj", "{BA787E6A-31E3-4BB1-AB5A-3987BDAFC4FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cucumber.Pro.SpecFlowPlugin.SampleProject", "tests\Cucumber.Pro.SpecFlowPlugin.SampleProject\Cucumber.Pro.SpecFlowPlugin.SampleProject.csproj", "{BA787E6A-31E3-4BB1-AB5A-3987BDAFC4FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cucumber.Pro.SpecFlowPlugin.Tests", "..\tests\Cucumber.Pro.SpecFlowPlugin.Tests\Cucumber.Pro.SpecFlowPlugin.Tests.csproj", "{ECFB24E2-1800-4193-BE06-8B5A98307A0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cucumber.Pro.SpecFlowPlugin.Tests", "tests\Cucumber.Pro.SpecFlowPlugin.Tests\Cucumber.Pro.SpecFlowPlugin.Tests.csproj", "{ECFB24E2-1800-4193-BE06-8B5A98307A0D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{939C1996-54DD-4D9D-82D6-8052F4E1D275}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\README.md = ..\..\README.md
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Global
