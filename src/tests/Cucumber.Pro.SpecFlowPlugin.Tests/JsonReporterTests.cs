@@ -36,6 +36,18 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
         {
             var reporter = new JsonReporter(null);
             var config = ConfigKeys.CreateDefaultConfig();
+            config.Set(ConfigKeys.CUCUMBERPRO_PROJECTNAME, "myproject");
+
+            Assert.Throws<ConfigurationErrorsException>(() =>
+                InitializeReporter(reporter, config));
+        }
+
+        [Fact]
+        public void Throws_when_projectname_cannot_be_detected()
+        {
+            var reporter = new JsonReporter(null);
+            var config = ConfigKeys.CreateDefaultConfig();
+            config.Set(ConfigKeys.CUCUMBERPRO_BRANCH, "branch1");
 
             Assert.Throws<ConfigurationErrorsException>(() =>
                 InitializeReporter(reporter, config));
@@ -47,6 +59,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
             var reporter = new JsonReporter(null);
             var config = ConfigKeys.CreateDefaultConfig();
             config.Set(ConfigKeys.CUCUMBERPRO_BRANCH, "branch1");
+            config.Set(ConfigKeys.CUCUMBERPRO_PROJECTNAME, "myproject");
 
             InitializeReporter(reporter, config);
             reporter.OnTestRunFinished(new TestRunFinishedEvent());
