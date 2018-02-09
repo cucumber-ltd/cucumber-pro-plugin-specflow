@@ -17,3 +17,4 @@
     [ ] Support undefined/skipped(?) result
     [ ] Support background(?)
     [ ] Support parallel run
+    [ ] Convert feature file paths to relative
