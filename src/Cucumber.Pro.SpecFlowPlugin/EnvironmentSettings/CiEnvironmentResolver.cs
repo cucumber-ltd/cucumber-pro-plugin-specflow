@@ -42,6 +42,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
                 DetectCircle(env) ??
                 DetectJenkins(env) ??
                 DetectTravis(env) ??
+                DetectTfs(env) ??
                 CreateLocal(env);
         }
 
@@ -94,6 +95,16 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
             var projectRepoSlug = vaules.Item3;
             var projectName = projectRepoSlug?.Split('/').Last();
             return new CiEnvironmentResolver("Travis", vaules.Item1, vaules.Item2, projectName);
+        }
+
+        // https://docs.microsoft.com/en-us/vsts/build-release/concepts/definitions/build/variables?tabs=batch#predefined-variables
+        private static CiEnvironmentResolver DetectTfs(IDictionary<string, string> env)
+        {
+            var vaules = GetEnvValues(env,
+                "BUILD_BUILDNUMBER",
+                "BUILD_SOURCEBRANCHNAME",
+                "SYSTEM_TEAMPROJECT");
+            return vaules == null ? null : new CiEnvironmentResolver("TFS", vaules.Item1, vaules.Item2, vaules.Item3);
         }
 
         private static CiEnvironmentResolver CreateLocal(IDictionary<string, string> env)
