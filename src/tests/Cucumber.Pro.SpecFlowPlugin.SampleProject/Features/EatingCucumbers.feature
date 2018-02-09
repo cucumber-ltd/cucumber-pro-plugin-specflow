@@ -11,3 +11,12 @@ Feature: Eating cucumbers
     Given I have already eaten 5 cucumbers
     When I eat 2 cucumbers
     Then I should have 7 cucumbers in my belly
+
+  Scenario Outline: Few cucumbers outline
+    Given I have already eaten 5 cucumbers
+    When I eat 2 cucumbers
+    Then I should have 7 cucumbers in my belly
+  Examples:
+    | a | b | c |
+    | 5 | 2 | 7 |
+    | 6 | 2 | 8 |

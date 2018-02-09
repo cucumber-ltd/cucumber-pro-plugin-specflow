@@ -12,7 +12,7 @@
     [x] Automated smoke test
     [x] NuGet package
     [x] Release script
-    [!] TFS Support
+    [x] TFS Support
     [x] Demo project
     [x] Verbose logging
     [ ] Demo
@@ -25,6 +25,7 @@
     [ ] icon, texts, etc of NuGet package
     [ ] Configure results.json file
     [ ] Use temp results.json file by default
+    [ ] TFS Build Line++ issue
 
 # Questions
 

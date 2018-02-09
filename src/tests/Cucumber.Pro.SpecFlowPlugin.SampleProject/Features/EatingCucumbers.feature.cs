@@ -111,6 +111,26 @@ namespace Cucumber.Pro.SpecFlowPlugin.SampleProject.Features
             this.ScenarioCleanup();
         }
         
+        [Xunit.TheoryAttribute(DisplayName="Few cucumbers outline")]
+        [Xunit.TraitAttribute("FeatureTitle", "Eating cucumbers")]
+        [Xunit.TraitAttribute("Description", "Few cucumbers outline")]
+        [Xunit.InlineDataAttribute("5", "2", "7", new string[0])]
+        [Xunit.InlineDataAttribute("6", "2", "8", new string[0])]
+        public virtual void FewCucumbersOutline(string a, string b, string c, string[] exampleTags)
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Few cucumbers outline", exampleTags);
+#line 15
+  this.ScenarioSetup(scenarioInfo);
+#line 16
+    testRunner.Given("I have already eaten 5 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 17
+    testRunner.When("I eat 2 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 18
+    testRunner.Then("I should have 7 cucumbers in my belly", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "2.2.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable
