@@ -10,14 +10,13 @@ using Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings;
 using Cucumber.Pro.SpecFlowPlugin.Events;
 using Cucumber.Pro.SpecFlowPlugin.Formatters;
 using Cucumber.Pro.SpecFlowPlugin.Publishing;
-using TechTalk.SpecFlow.Tracing;
 
 namespace Cucumber.Pro.SpecFlowPlugin
 {
     public class JsonReporter : IFormatter
     {
         private const string DEFAULT_PROFILE = "default";
-        private const string CUCUMBERPRO_GIT_BRANCH_SEND = "cucumber_pro_git_branch"; // should be ConfigKeys.CUCUMBERPRO_BRANCH
+        private const string GIT_BRANCH_SEND = "GIT_BRANCH";
 
         private readonly IObjectContainer _objectContainer;
         private JsonFormatter _jsonFormatter;
@@ -66,11 +65,11 @@ namespace Cucumber.Pro.SpecFlowPlugin
                 throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_PROJECTNAME} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_PROJECTNAME)}");
 
             _envToSend = envFilter.Filter(systemEnv);
-            if (!_envToSend.ContainsKey(CUCUMBERPRO_GIT_BRANCH_SEND))
+            if (!_envToSend.ContainsKey(GIT_BRANCH_SEND))
             {
                 if (config.IsNull(ConfigKeys.CUCUMBERPRO_BRANCH))
                     throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_BRANCH} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_BRANCH)}");
-                _envToSend[CUCUMBERPRO_GIT_BRANCH_SEND] = config.GetString(ConfigKeys.CUCUMBERPRO_BRANCH);
+                _envToSend[GIT_BRANCH_SEND] = config.GetString(ConfigKeys.CUCUMBERPRO_BRANCH);
             }
 
             _profile = config.IsNull(ConfigKeys.CUCUMBERPRO_PROFILE) ? DEFAULT_PROFILE :

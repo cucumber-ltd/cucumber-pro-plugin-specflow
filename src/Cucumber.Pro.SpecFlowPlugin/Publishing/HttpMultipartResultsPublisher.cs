@@ -123,7 +123,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
         private static StringContent GetEnvContent(IDictionary<string, string> env)
         {
             // CPro only supports Unix-like line endings (\n)
-            return new StringContent(string.Join("\n", env.Select(e => $"{e.Key}={e.Value}")));
+            return new StringContent(string.Join("\n", env.OrderBy(e => e.Key).Select(e => $"{e.Key}={e.Value}")));
         }
 
         private void SetupAuthorization(HttpClient httpClient)

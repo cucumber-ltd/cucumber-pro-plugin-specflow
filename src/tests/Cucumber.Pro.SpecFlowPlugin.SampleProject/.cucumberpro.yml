@@ -38,4 +38,4 @@
     # a value for this setting - the plugin automatically publishes if it detects it is running
     # in a CI environment. We recommend setting this to true only if you are experimenting with
     # the configuration locally.
-    publish:
+    publish: true
