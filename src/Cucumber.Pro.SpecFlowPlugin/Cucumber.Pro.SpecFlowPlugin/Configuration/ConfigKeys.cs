@@ -11,12 +11,6 @@
 
         // Project name
         public const string CUCUMBERPRO_PROJECTNAME = "cucumberpro.projectname";
-        // https://confluence.atlassian.com/bamboo/bamboo-variables-289277087.html
-        public const string bamboo_planRepository_name = "bamboo_planRepository_name";
-        // https://circleci.com/docs/2.0/env-vars/#circleci-environment-variable-descriptions
-        public const string CIRCLE_PROJECT_REPONAME = "CIRCLE_PROJECT_REPONAME";
-        // https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables
-        public const string TRAVIS_REPO_SLUG = "TRAVIS_REPO_SLUG";
 
         // resolved settings
         public const string CUCUMBERPRO_REVISION = "cucumberpro.revision";
@@ -33,9 +27,6 @@
             config.Set(CUCUMBERPRO_LOGGING, "WARN");
 
             config.SetNull(CUCUMBERPRO_PROJECTNAME);
-            config.SetNull(bamboo_planRepository_name);
-            config.SetNull(CIRCLE_PROJECT_REPONAME);
-            config.SetNull(TRAVIS_REPO_SLUG);
             return config;
         }
 

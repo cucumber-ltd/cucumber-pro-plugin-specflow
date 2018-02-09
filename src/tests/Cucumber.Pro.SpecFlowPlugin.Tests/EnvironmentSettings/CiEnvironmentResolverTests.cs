@@ -20,6 +20,26 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             };
         }
 
+        private static Dictionary<string, string> GetCircleEnv()
+        {
+            return new Dictionary<string, string>
+            {
+                { "CIRCLE_SHA1", "rev1"},
+                { "CIRCLE_BRANCH", "branch1"},
+                { "CIRCLE_PROJECT_REPONAME", "myproject"},
+            };
+        }
+
+        private static Dictionary<string, string> GetTravisEnv()
+        {
+            return new Dictionary<string, string>
+            {
+                { "TRAVIS_COMMIT", "rev1"},
+                { "TRAVIS_BRANCH", "branch1"},
+                { "TRAVIS_REPO_SLUG", "owner/myproject"},
+            };
+        }
+
         [Fact]
         public void Can_resolve_branch()
         {
@@ -40,6 +60,28 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             resolver.Resolve(config);
 
             Assert.Equal("rev1", config.GetString(ConfigKeys.CUCUMBERPRO_REVISION));
+        }
+
+        [Fact]
+        public void Can_resolve_project_name()
+        {
+            var resolver = CiEnvironmentResolver.Detect(GetCircleEnv());
+
+            var config = ConfigKeys.CreateDefaultConfig();
+            resolver.Resolve(config);
+
+            Assert.Equal("myproject", config.GetString(ConfigKeys.CUCUMBERPRO_PROJECTNAME));
+        }
+
+        [Fact]
+        public void Can_resolve_project_name_from_travis()
+        {
+            var resolver = CiEnvironmentResolver.Detect(GetTravisEnv());
+
+            var config = ConfigKeys.CreateDefaultConfig();
+            resolver.Resolve(config);
+
+            Assert.Equal("myproject", config.GetString(ConfigKeys.CUCUMBERPRO_PROJECTNAME));
         }
 
         [Fact]
