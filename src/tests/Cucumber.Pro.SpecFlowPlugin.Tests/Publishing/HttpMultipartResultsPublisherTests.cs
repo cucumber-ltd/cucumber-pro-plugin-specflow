@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Cucumber.Pro.SpecFlowPlugin.Publishing;
 using Nancy;
 using Nancy.Bootstrapper;
@@ -19,6 +20,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             public static string Revision;
             public static string ProfileName;
             public static string Json;
+            public static string Auth;
             public static Dictionary<string, string> Env;
 
             public CProStubNancyModule()
@@ -26,6 +28,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
                 Post["{projectName}/{revision}"] = parameters =>
                 {
                     IsInvoked = true;
+
+                    Auth = Request.Headers.Authorization;
 
                     ProjectName = parameters.projectName;
                     Revision = parameters.revision;
@@ -44,30 +48,46 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             }
         }
 
-        [Fact]
-        public void posts_results_as_multipart_formadata()
+        const string SampleJson = @"[{ ""name"": ""Eating cucumbers""}]";
+        static readonly Dictionary<string, string> SampleEnv = new Dictionary<string, string> { { "env1", "value1" }, { "env2", "value2" } };
+        const string SampleProfileName = "my-profile";
+        const string SampleToken = "my-token";
+
+        private static void PublishResultsToStub()
         {
             var tempFile = Path.GetTempFileName();
-            var json = @"[{ ""name"": ""Eating cucumbers""}]";
-            File.WriteAllText(tempFile, json);
-            var env = new Dictionary<string, string> { { "env1", "value1" }, { "env2", "value2" } };
-            var profileName = "my-profile";
+            File.WriteAllText(tempFile, SampleJson);
 
             var hostConfiguration = new HostConfiguration {RewriteLocalhost = false};
-            using (var nancyHost = new NancyHost(new Uri("http://localhost:8082/tests/results/"), NancyBootstrapperLocator.Bootstrapper, hostConfiguration))
+            using (var nancyHost = new NancyHost(new Uri("http://localhost:8082/tests/results/"),
+                NancyBootstrapperLocator.Bootstrapper, hostConfiguration))
             {
                 nancyHost.Start();
 
-                var publisher = new HttpMultipartResultsPublisher("http://localhost:8082/tests/results/prj/rev1");
-                publisher.PublishResults(tempFile, env, profileName);
+                var publisher = new HttpMultipartResultsPublisher("http://localhost:8082/tests/results/prj/rev1", SampleToken);
+                publisher.PublishResults(tempFile, SampleEnv, SampleProfileName);
             }
 
             Assert.True(CProStubNancyModule.IsInvoked);
+        }
+
+        [Fact]
+        public void Posts_results_as_multipart_formadata()
+        {
+            PublishResultsToStub();
             Assert.Equal("prj", CProStubNancyModule.ProjectName);
             Assert.Equal("rev1", CProStubNancyModule.Revision);
-            Assert.Equal(profileName, CProStubNancyModule.ProfileName);
-            Assert.Equal(env, CProStubNancyModule.Env);
-            Assert.Equal(json, CProStubNancyModule.Json);
+            Assert.Equal(SampleProfileName, CProStubNancyModule.ProfileName);
+            Assert.Equal(SampleEnv, CProStubNancyModule.Env);
+            Assert.Equal(SampleJson, CProStubNancyModule.Json);
+        }
+
+        [Fact]
+        public void Sets_token_as_basic_auth()
+        {
+            PublishResultsToStub();
+            var expectedAuth = $"Basic {Convert.ToBase64String(Encoding.ASCII.GetBytes(SampleToken + ":"))}";
+            Assert.Equal(expectedAuth, CProStubNancyModule.Auth);
         }
     }
 }
