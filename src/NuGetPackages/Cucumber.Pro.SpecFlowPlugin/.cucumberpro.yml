@@ -1,0 +1,34 @@
+﻿cucumberpro:
+  # The plugin sends your local environment variables to Cucumber Pro so it can detect the CI build number, 
+  # git branch/tag and other information about the build. This mask is a regular expression for filtering
+  # out sensitive values that should not be sent to Cucumber Pro.
+  envmask: SECRET|KEY|TOKEN|PASSWORD|PWD
+
+  # Not needed if the build is running on a preferred CI server and the Cucumber Pro project 
+  # name is identical to the CI server project name. Define this environment variable to override 
+  # the project name.
+  projectname: 
+
+  # (This configuration can be skipped for private Cucumber Pro appliance installations where results publishing is open).
+  # Results are published to Cucumber Pro using HTTP/HTTPS. Each Cucumber Pro project has a token for this purpose.
+  # You can find it in the project settings (press `?` to display it).
+  # This token should be assigned to a `CUCUMBERPRO_TOKEN` environment variable on the build server, on a per-project basis.
+  # Consult your CI server's documentation for details about defining per-project environment variables.
+  # Some CI servers such as Travis and Circle CI allow you to define environment variables in a file checked into git.
+  # *DO NOT DO THIS* - as it would allow anyone with read acceess to your repository to publish results.
+  token: 
+
+  # Override this if you are using a privately hosted Cucumber Pro appliance.
+  # We recommend setting this with a CUCUMBERPRO_URL environment variable defined globally on your build server.
+  url: https://app.cucumber.pro/
+
+  connection:
+    # If a http or ssh connection takes longer than this (milliseconds), time out the connection.
+    timeout: 5000
+
+  results:
+    # Whether or not to publish results to Cucumber Pro. Normally you should *not* provide
+    # a value for this setting - the plugin automatically publishes if it detects it is running
+    # in a CI environment. We recommend setting this to true only if you are experimenting with
+    # the configuration locally.
+    publish:

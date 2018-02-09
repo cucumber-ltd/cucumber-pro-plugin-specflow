@@ -18,3 +18,5 @@
     [ ] Support background(?)
     [ ] Support parallel run
     [ ] Convert feature file paths to relative
+    [ ] readme.txt of the NuGet package
+    [ ] icon, texts, etc of NuGet package

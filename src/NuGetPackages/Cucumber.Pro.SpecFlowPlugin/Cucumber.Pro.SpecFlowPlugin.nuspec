@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>Cucumber.Pro.SpecFlowPlugin</id>
+    <version>1.0.0-localdev</version>
+    <title>Publish test results to Cucumber Pro</title>
+    <authors>Cucumber Ltd</authors>
+    <owners>Cucumber Ltd</owners>
+    <description>SpecFlow plugin to publish test results to Cucumber Pro (https://cucumber.io/pro).</description>
+    <summary>SpecFlow plugin to publish test results to Cucumber Pro (https://cucumber.io/pro).</summary>
+    <!--<releaseNotes>See TODO</releaseNotes>-->
+    <language>en-US</language>
+    <projectUrl>https://cucumber.io/pro</projectUrl>
+    <licenseUrl>https://cucumber.io/pro</licenseUrl>
+    <!--<iconUrl>TODO</iconUrl>-->
+    <copyright>Copyright © 2018 Cucumber Ltd</copyright>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>specflow bdd cucumber cucumber.pro</tags>
+    <dependencies>
+      <dependency id="SpecFlow" version="2.2.1" />
+      <dependency id="YamlDotNet" version="4.3.0" />
+    </dependencies>
+  </metadata>
+</package>

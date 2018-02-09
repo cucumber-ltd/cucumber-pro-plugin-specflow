@@ -1,0 +1,23 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
+  <ItemGroup Label="Cucumber.Pro.SpecFlowPlugin">
+    <additionalFiles Include="$(MSBuildThisFileDirectory)\..\..\Cucumber.Pro.SpecFlowPlugin\bin\$(Configuration)\Cucumber.Pro.SpecFlowPlugin.dll">
+      <targetFolder>Cucumber.Pro.SpecFlowPlugin\lib\net45</targetFolder>
+    </additionalFiles>
+
+    <additionalFiles Include="$(MSBuildThisFileDirectory)\..\..\Cucumber.Pro.SpecFlowPlugin\bin\$(Configuration)\Cucumber.Pro.SpecFlowPlugin.pdb">
+      <targetFolder>Cucumber.Pro.SpecFlowPlugin\lib\net45</targetFolder>
+    </additionalFiles>
+
+    <additionalFiles Include="$(MSBuildThisFileDirectory)\readme.txt">
+      <targetFolder>Cucumber.Pro.SpecFlowPlugin</targetFolder>
+    </additionalFiles>
+
+    <additionalFiles Include="$(MSBuildThisFileDirectory)\App.config.transform">
+      <targetFolder>Cucumber.Pro.SpecFlowPlugin\content</targetFolder>
+    </additionalFiles>
+
+    <additionalFiles Include="$(MSBuildThisFileDirectory)\.cucumberpro.yml">
+      <targetFolder>Cucumber.Pro.SpecFlowPlugin\content</targetFolder>
+    </additionalFiles>
+  </ItemGroup>
+</Project>
