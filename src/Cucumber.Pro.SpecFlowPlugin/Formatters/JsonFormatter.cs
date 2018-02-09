@@ -99,8 +99,6 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
                 }
             };
             testCaseResult.StepResults.Add(stepResult);
-
-            _traceListener.WriteToolOutput($"JsonFormatter: Step Finished");
         }
 
         public string GetJson()

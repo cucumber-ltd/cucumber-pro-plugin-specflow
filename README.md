@@ -9,7 +9,7 @@
     [x] Configure profile
     [ ] Allow specifying custom config file
     [x] Only publish on CI, except forced
-    [ ] Automated smoke test
+    [x] Automated smoke test
     [x] NuGet package
     [x] Release script
     [ ] TFS Support

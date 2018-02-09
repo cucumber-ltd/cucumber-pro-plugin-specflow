@@ -57,6 +57,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
             if (!ciEnvironmentResolver.IsDetected && !IsForcePublish(config))
             {
                 _shouldPublish = false;
+                traceListener.WriteToolOutput($"Cucumber Pro plugin detected no CI environment and local publishing is not configured ({ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH}) -- skip publishing for this test run");
                 return;
             }
 
