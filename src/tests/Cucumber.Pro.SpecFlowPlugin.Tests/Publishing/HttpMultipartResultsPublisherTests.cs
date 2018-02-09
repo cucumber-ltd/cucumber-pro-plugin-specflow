@@ -7,12 +7,29 @@ using Cucumber.Pro.SpecFlowPlugin.Publishing;
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Hosting.Self;
+using TechTalk.SpecFlow.Tracing;
 using Xunit;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
 {
     public class HttpMultipartResultsPublisherTests
     {
+        public class StubTraceListener : ITraceListener
+        {
+            public List<string> TestOutput { get; } = new List<string>();
+            public List<string> ToolOutput { get; } = new List<string>();
+
+            public void WriteTestOutput(string message)
+            {
+                TestOutput.Add(message);
+            }
+
+            public void WriteToolOutput(string message)
+            {
+                ToolOutput.Add(message);
+            }
+        }
+
         public class CProStubNancyModule : NancyModule
         {
             public static bool IsInvoked;
@@ -52,8 +69,10 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
         static readonly Dictionary<string, string> SampleEnv = new Dictionary<string, string> { { "env1", "value1" }, { "env2", "value2" } };
         const string SampleProfileName = "my-profile";
         const string SampleToken = "my-token";
+        readonly StubTraceListener stubTraceListener = new StubTraceListener();
+        const string SampleUrl = "http://localhost:8082/tests/results/prj/rev1";
 
-        private static void PublishResultsToStub()
+        private void PublishResultsToStub()
         {
             var tempFile = Path.GetTempFileName();
             File.WriteAllText(tempFile, SampleJson);
@@ -64,7 +83,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             {
                 nancyHost.Start();
 
-                var publisher = new HttpMultipartResultsPublisher("http://localhost:8082/tests/results/prj/rev1", SampleToken);
+                var publisher = new HttpMultipartResultsPublisher(SampleUrl, SampleToken, stubTraceListener);
                 publisher.PublishResults(tempFile, SampleEnv, SampleProfileName);
             }
 
@@ -88,6 +107,14 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             PublishResultsToStub();
             var expectedAuth = $"Basic {Convert.ToBase64String(Encoding.ASCII.GetBytes(SampleToken + ":"))}";
             Assert.Equal(expectedAuth, CProStubNancyModule.Auth);
+        }
+
+        [Fact]
+        public void Logs_success_message()
+        {
+            PublishResultsToStub();
+            Assert.Contains(stubTraceListener.ToolOutput, msg => msg.Contains("Cucumber Pro"));
+            Assert.Contains(stubTraceListener.ToolOutput, msg => msg.Contains(SampleUrl));
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using TechTalk.SpecFlow.Tracing;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Publishing
 {
@@ -18,11 +19,13 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
 
         private readonly string _url;
         private readonly string _token;
+        private readonly ITraceListener _traceListener;
 
-        public HttpMultipartResultsPublisher(string url = "https://app.cucumber.pro/tests/results/SpecSol_Test1/master", string token = "fe3e1a5f27789a139a963ff56cddb00816c")
+        public HttpMultipartResultsPublisher(string url = "https://app.cucumber.pro/tests/results/SpecSol_Test1/master", string token = "fe3e1a5f27789a139a963ff56cddb00816c", ITraceListener traceListener = null)
         {
             _url = url;
             _token = token;
+            _traceListener = traceListener;
         }
 
         public void PublishResults(string resultsJsonFilePath, IDictionary<string, string> env, string profileName)
@@ -43,6 +46,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             content.Add(GetPayloadContent(resultsJson), PART_PAYLOAD, "payload.json");
 
             var response = httpClient.PostAsync(_url, content).Result;
+            if (response.IsSuccessStatusCode)
+                _traceListener?.WriteToolOutput($"Published results to Cucumber Pro: {_url}");
+
             Console.WriteLine(response);
         }
 
