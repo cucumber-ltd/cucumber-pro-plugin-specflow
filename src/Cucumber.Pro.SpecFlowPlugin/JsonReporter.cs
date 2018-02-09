@@ -64,6 +64,12 @@ namespace Cucumber.Pro.SpecFlowPlugin
             if (config.IsNull(ConfigKeys.CUCUMBERPRO_PROJECTNAME))
                 throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_PROJECTNAME} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_PROJECTNAME)}");
 
+            if (!config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_REPOSITORYROOT))
+            {
+                logger.Log(TraceLevel.Verbose, $"CPro: Using '{config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REPOSITORYROOT)}' as repository root.");
+                _jsonFormatter.SetPathBaseFolder(config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REPOSITORYROOT));
+            }
+
             _envToSend = envFilter.Filter(systemEnv);
             if (!_envToSend.ContainsKey(GIT_BRANCH_SEND))
             {

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using Cucumber.Pro.SpecFlowPlugin.Configuration;
 
 namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
@@ -11,13 +13,15 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
         private readonly string _revision;
         private readonly string _branch;
         private readonly string _projectName;
+        private readonly string _repositoryRoot;
 
-        public CiEnvironmentResolver(string ciName, string revision, string branch, string projectName)
+        public CiEnvironmentResolver(string ciName, string revision, string branch, string projectName, string repositoryRoot = null)
         {
             _revision = revision;
             _branch = branch;
             _projectName = projectName;
             _ciName = ciName;
+            _repositoryRoot = repositoryRoot;
         }
 
         public bool IsDetected => _ciName != null;
@@ -28,6 +32,23 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
             SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_REVISION, _revision);
             SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_BRANCH, _branch);
             SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_PROJECTNAME, _projectName);
+            SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_GIT_REPOSITORYROOT, _repositoryRoot ?? DetectRepositoryRoot());
+        }
+
+        private string DetectRepositoryRoot()
+        {
+            var testFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+            if (testFolder == null)
+                return null;
+            var directory = new DirectoryInfo(testFolder);
+            while (directory != null)
+            {
+                if (directory.GetDirectories(".git").Any())
+                    return directory.FullName;
+
+                directory = directory.Parent;
+            }
+            return null;
         }
 
         private void SetIfNotSet(Config config, string key, string value)
@@ -47,12 +68,12 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
                 CreateLocal(env);
         }
 
-        private static Tuple<string, string, string> GetEnvValues(IDictionary<string, string> env, string revisionKey, string branchKey, string projectNameKey)
+        private static Tuple<string, string, string, string> GetEnvValues(IDictionary<string, string> env, string revisionKey, string branchKey, string projectNameKey, string repositoryRootKey = null)
         {
             if (!env.ContainsKey(revisionKey))
                 return null;
 
-            return new Tuple<string, string, string>(env[revisionKey], env[branchKey], projectNameKey == null ? null : env[projectNameKey]);
+            return new Tuple<string, string, string, string>(env[revisionKey], env[branchKey], projectNameKey == null ? null : env[projectNameKey], repositoryRootKey == null ? null : env[repositoryRootKey]);
         }
 
         // https://confluence.atlassian.com/bamboo/bamboo-variables-289277087.html
@@ -104,8 +125,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
             var vaules = GetEnvValues(env,
                 "BUILD_BUILDNUMBER",
                 "BUILD_SOURCEBRANCHNAME",
-                "SYSTEM_TEAMPROJECT");
-            return vaules == null ? null : new CiEnvironmentResolver("TFS", vaules.Item1, vaules.Item2, vaules.Item3);
+                "SYSTEM_TEAMPROJECT",
+                "BUILD_REPOSITORY_LOCALPATH");
+            return vaules == null ? null : new CiEnvironmentResolver("TFS", vaules.Item1, vaules.Item2, vaules.Item3, vaules.Item4);
         }
 
         private static CiEnvironmentResolver CreateLocal(IDictionary<string, string> env)

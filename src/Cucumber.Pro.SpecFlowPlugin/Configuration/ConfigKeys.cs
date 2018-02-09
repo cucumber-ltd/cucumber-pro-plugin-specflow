@@ -15,6 +15,7 @@
         // resolved settings
         public const string CUCUMBERPRO_REVISION = "cucumberpro.revision";
         public const string CUCUMBERPRO_BRANCH = "cucumberpro.git.branch";
+        public const string CUCUMBERPRO_GIT_REPOSITORYROOT = "cucumberpro.git.repositoryroot";
 
         public static Config CreateDefaultConfig()
         {

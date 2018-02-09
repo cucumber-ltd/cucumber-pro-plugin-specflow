@@ -18,10 +18,18 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
         private readonly ITraceListener _traceListener;
         private readonly List<FeatureResult> _featureResults = new List<FeatureResult>();
         private FeatureResult _currentFeatureResult = null;
+        private string _pathBaseFolder = null;
 
         public JsonFormatter(ITraceListener traceListener)
         {
             _traceListener = traceListener;
+        }
+
+        public void SetPathBaseFolder(string pathBaseFolder)
+        {
+            if (_featureResults.Any())
+                throw new InvalidOperationException("The path base folder cannot be changed once there are features reported.");
+            _pathBaseFolder = pathBaseFolder;
         }
 
         public void SetEventPublisher(IEventPublisher publisher)
@@ -42,10 +50,11 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             {
                 var featureFileFrame = GetFeatureFileFrame();
                 var featureFile = featureFileFrame?.GetFileName() ?? "Unknown.feature";
-                //TODO: make path relative to Git root
-                int hack_srcIndex = featureFile.IndexOf("src", StringComparison.InvariantCultureIgnoreCase);
-                if (hack_srcIndex >= 0)
-                    featureFile = featureFile.Substring(hack_srcIndex);
+
+                if (Path.IsPathRooted(featureFile) && _pathBaseFolder != null)
+                {
+                    featureFile = MakeRelativePath(_pathBaseFolder, featureFile);
+                }
 
                 _currentFeatureResult = new FeatureResult
                 {
@@ -63,6 +72,39 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
                 Type = "scenario" //TODO
             };
             _currentFeatureResult.TestCaseResults.Add(testCaseResult);
+        }
+
+        /// <summary>
+        /// Creates a relative path from one file or folder to another.
+        /// </summary>
+        /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
+        /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>
+        /// <returns>The relative path from the start directory to the end path or <c>toPath</c> if the paths are not related.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="UriFormatException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static String MakeRelativePath(String fromPath, String toPath)
+        {
+            if (String.IsNullOrEmpty(fromPath)) throw new ArgumentNullException("fromPath");
+            if (String.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
+
+            if (!fromPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                fromPath += Path.DirectorySeparatorChar;
+
+            Uri fromUri = new Uri(fromPath);
+            Uri toUri = new Uri(toPath);
+
+            if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
+
+            Uri relativeUri = fromUri.MakeRelativeUri(toUri);
+            String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+            if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
+            {
+                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            }
+
+            return relativePath;
         }
 
         private static int GetFeatureFileLine()
