@@ -5,6 +5,6 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
 {
     public interface IResultsPublisherFactory
     {
-        IResultsPublisher Create(Config config, ITraceListener traceListener);
+        IResultsPublisher Create(Config config, ILogger logger);
     }
 }

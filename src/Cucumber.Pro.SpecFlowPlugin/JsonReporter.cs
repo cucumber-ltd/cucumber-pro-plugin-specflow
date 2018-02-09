@@ -39,14 +39,14 @@ namespace Cucumber.Pro.SpecFlowPlugin
             var jsonFormatter = _objectContainer.Resolve<JsonFormatter>();
             var envFilter = _objectContainer.Resolve<EnvFilter>();
             var config = _objectContainer.Resolve<Config>();
-            var traceListener = _objectContainer.Resolve<ITraceListener>();
             var resultsPublisherFactory = _objectContainer.Resolve<ResultsPublisherFactory>();
             var environmentVariablesProvider = _objectContainer.Resolve<EnvironmentVariablesProvider>();
+            var logger = _objectContainer.Resolve<Logger>();
 
-            Initialize(config, envFilter, traceListener, resultsPublisherFactory, jsonFormatter, environmentVariablesProvider);
+            Initialize(config, envFilter, resultsPublisherFactory, jsonFormatter, environmentVariablesProvider, logger);
         }
 
-        internal void Initialize(Config config, EnvFilter envFilter, ITraceListener traceListener, IResultsPublisherFactory resultsPublisherFactory, JsonFormatter jsonFormatter, IEnvironmentVariablesProvider environmentVariablesProvider)
+        internal void Initialize(Config config, EnvFilter envFilter, IResultsPublisherFactory resultsPublisherFactory, JsonFormatter jsonFormatter, IEnvironmentVariablesProvider environmentVariablesProvider, ILogger logger)
         {
             _jsonFormatter = jsonFormatter;
 
@@ -57,9 +57,10 @@ namespace Cucumber.Pro.SpecFlowPlugin
             if (!ciEnvironmentResolver.IsDetected && !IsForcePublish(config))
             {
                 _shouldPublish = false;
-                traceListener.WriteToolOutput($"Cucumber Pro plugin detected no CI environment and local publishing is not configured ({ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH}) -- skip publishing for this test run");
+                logger.Log(TraceLevel.Info, $"Cucumber Pro plugin detected no CI environment and local publishing is not configured ({ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH}) -- skip publishing for this test run");
                 return;
             }
+            logger.Log(TraceLevel.Info, $"Cucumber Pro plugin detected CI environment as '{ciEnvironmentResolver.CiName}'");
 
             if (config.IsNull(ConfigKeys.CUCUMBERPRO_PROJECTNAME))
                 throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_PROJECTNAME} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_PROJECTNAME)}");
@@ -75,7 +76,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
             _profile = config.IsNull(ConfigKeys.CUCUMBERPRO_PROFILE) ? DEFAULT_PROFILE :
                 config.GetString(ConfigKeys.CUCUMBERPRO_PROFILE);
 
-            _resultsPublisher = resultsPublisherFactory.Create(config, traceListener);
+            _resultsPublisher = resultsPublisherFactory.Create(config, logger);
             _shouldPublish = true;
         }
 

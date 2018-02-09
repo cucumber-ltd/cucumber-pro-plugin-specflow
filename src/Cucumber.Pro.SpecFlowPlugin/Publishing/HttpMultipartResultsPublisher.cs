@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -21,22 +22,22 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
 
         private readonly string _url;
         private readonly string _token;
-        private readonly ITraceListener _traceListener;
+        private readonly ILogger _logger;
         private readonly int _timeoutMilliseconds;
 
-        public HttpMultipartResultsPublisher(Config config, ITraceListener traceListener) : this(
-            traceListener,
+        public HttpMultipartResultsPublisher(Config config, ILogger logger) : this(
+            logger,
             CucumberProResultsUrlBuilder.BuildCucumberProUrl(config),
             config.GetString(ConfigKeys.CUCUMBERPRO_TOKEN),
             config.GetInteger(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT))
         {
         }
 
-        public HttpMultipartResultsPublisher(ITraceListener traceListener, string url, string token, int timeoutMilliseconds)
+        public HttpMultipartResultsPublisher(ILogger logger, string url, string token, int timeoutMilliseconds)
         {
             _url = url;
             _token = token;
-            _traceListener = traceListener;
+            _logger = logger;
             _timeoutMilliseconds = timeoutMilliseconds;
         }
 
@@ -58,7 +59,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             {
                 if (!Uri.TryCreate(_url, UriKind.Absolute, out var urlUri) || !IsSupportedScheme(urlUri))
                 {
-                    _traceListener?.WriteToolOutput($"Invalid URL for publising results to Cucumber Pro: {_url}");
+                    _logger?.Log(TraceLevel.Error, $"Invalid URL for publising results to Cucumber Pro: {_url}");
                     return;
                 }
 
@@ -71,9 +72,11 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
                 content.Add(GetEnvContent(env), PART_ENV, "env.txt");
                 content.Add(GetPayloadContent(resultsJson), PART_PAYLOAD, "payload.json");
 
+                DumpDebugInfo(content);
+
                 var response = httpClient.PostAsync(urlUri, content).Result;
                 if (response.IsSuccessStatusCode)
-                    _traceListener?.WriteToolOutput($"Published results to Cucumber Pro: {_url}");
+                    _logger?.Log(TraceLevel.Info, $"Published results to Cucumber Pro: {_url}");
                 else
                 {
                     var responseBody = response.Content.ReadAsStringAsync().Result;
@@ -86,17 +89,29 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
 
                     var message =
                         $"Failed to publish results to Cucumber Pro URL: {_url}, Status: {(int) response.StatusCode} {response.ReasonPhrase}{Environment.NewLine}{suggestion}{Environment.NewLine}{responseBody}";
-                    _traceListener?.WriteToolOutput(message);
+                    _logger?.Log(TraceLevel.Error, message);
                 }
             }
             catch (Exception timeoutEx) when(timeoutEx is TaskCanceledException ||
                 (timeoutEx is AggregateException && timeoutEx.InnerException is TaskCanceledException))
             {
-                _traceListener?.WriteToolOutput($"Publishing to Cucumber Pro timed out, consider increasing {ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT} (currently set to {_timeoutMilliseconds})");
+                _logger?.Log(TraceLevel.Warning, $"Publishing to Cucumber Pro timed out, consider increasing {ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT} (currently set to {_timeoutMilliseconds})");
             }
             catch (Exception ex)
             {
-                _traceListener?.WriteToolOutput("Unexpected error while publishing results to Cucumber Pro: " + ex);
+                _logger?.Log(TraceLevel.Error, "Unexpected error while publishing results to Cucumber Pro: " + ex);
+            }
+        }
+
+        private void DumpDebugInfo(MultipartFormDataContent content)
+        {
+            if (_logger.Level < TraceLevel.Verbose)
+                return;
+
+            _logger.Log(TraceLevel.Verbose, $"CPro: Sending POST to {_url}");
+            foreach (var part in content)
+            {
+                _logger.Log(TraceLevel.Verbose, $"PART: {part.Headers.ContentType}{Environment.NewLine}{part.ReadAsStringAsync().Result}");
             }
         }
 

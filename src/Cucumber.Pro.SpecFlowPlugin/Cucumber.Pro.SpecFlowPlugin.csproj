@@ -81,7 +81,9 @@
     <Compile Include="Formatters\JsonModel\ResultStatus.cs" />
     <Compile Include="Formatters\JsonModel\StepResult.cs" />
     <Compile Include="Formatters\JsonModel\TestCaseResult.cs" />
+    <Compile Include="ILogger.cs" />
     <Compile Include="JsonReporter.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Publishing\CucumberProResultsUrlBuilder.cs" />
     <Compile Include="Publishing\HttpMultipartResultsPublisher.cs" />

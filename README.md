@@ -12,8 +12,9 @@
     [x] Automated smoke test
     [x] NuGet package
     [x] Release script
-    [ ] TFS Support
+    [!] TFS Support
     [x] Demo project
+    [x] Verbose logging
     [ ] Demo
     [ ] Support scenario outlines
     [ ] Support undefined/skipped(?) result
@@ -22,7 +23,10 @@
     [ ] Convert feature file paths to relative
     [ ] readme.txt of the NuGet package
     [ ] icon, texts, etc of NuGet package
+    [ ] Configure results.json file
+    [ ] Use temp results.json file by default
 
 # Questions
 
 - How to configure profile (now: from config file)
+- Should we use INFO as default log level?

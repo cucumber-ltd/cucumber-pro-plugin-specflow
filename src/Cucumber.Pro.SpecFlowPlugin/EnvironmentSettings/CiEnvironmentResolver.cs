@@ -21,6 +21,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
         }
 
         public bool IsDetected => _ciName != null;
+        public string CiName => _ciName ?? "Local";
 
         public void Resolve(Config config)
         {

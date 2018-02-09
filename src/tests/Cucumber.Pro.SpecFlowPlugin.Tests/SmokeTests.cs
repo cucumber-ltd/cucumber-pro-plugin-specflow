@@ -107,6 +107,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
             Environment.SetEnvironmentVariable("CUCUMBERPRO_PROJECTNAME", "SpecSol_Test1", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_GIT_BRANCH", "master", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_TOKEN", "fe3e1a5f27789a139a963ff56cddb00816c", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("CUCUMBERPRO_LOGGING", "debug", EnvironmentVariableTarget.Process);
 
             var testRunner = GetTestRunner();
             RunScenario(testRunner);

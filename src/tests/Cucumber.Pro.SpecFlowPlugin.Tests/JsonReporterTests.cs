@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,16 @@ using Xunit;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Tests
 {
+    public class NullLogger : ILogger
+    {
+        public TraceLevel Level => TraceLevel.Off;
+
+        public void Log(TraceLevel messageLevel, string message)
+        {
+            //nop
+        }
+    }
+
     public class JsonReporterTests
     {
         private Mock<IResultsPublisher> _resultsPublisherMock;
@@ -25,15 +36,15 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
         {
             _resultsPublisherMock = new Mock<IResultsPublisher>();
             Mock<IResultsPublisherFactory> resultsPublisherFactoryStub = new Mock<IResultsPublisherFactory>();
-            resultsPublisherFactoryStub.Setup(f => f.Create(It.IsAny<Config>(), It.IsAny<ITraceListener>()))
+            resultsPublisherFactoryStub.Setup(f => f.Create(It.IsAny<Config>(), It.IsAny<ILogger>()))
                 .Returns(_resultsPublisherMock.Object);
             var traceListener = new NullListener();
             var environmentVariablesProviderMock = new Mock<IEnvironmentVariablesProvider>();
             environmentVariablesProviderMock.Setup(p => p.GetEnvironmentVariables())
                 .Returns(_env);
 
-            reporter.Initialize(config, new EnvFilter(config), traceListener, resultsPublisherFactoryStub.Object,
-                new JsonFormatter(traceListener), environmentVariablesProviderMock.Object);
+            reporter.Initialize(config, new EnvFilter(config), resultsPublisherFactoryStub.Object,
+                new JsonFormatter(traceListener), environmentVariablesProviderMock.Object, new NullLogger());
         }
 
         private static Config CreateUsualConfig()

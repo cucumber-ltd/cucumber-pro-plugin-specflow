@@ -98,7 +98,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
                 nancyHost.Start();
 
                 var publisher = publisherFactory != null ? publisherFactory() :
-                    new HttpMultipartResultsPublisher(stubTraceListener, url: SampleUrl, token: SampleToken, timeoutMilliseconds: timeout);
+                    new HttpMultipartResultsPublisher(stubTraceListener.Logger, url: SampleUrl, token: SampleToken, timeoutMilliseconds: timeout);
                 publisher.PublishResults(tempFile, SampleEnv, SampleProfileName);
             }
 
@@ -184,7 +184,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             config.Set(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT, 5000);
 
             CProStubNancyModule.Reset();
-            PublishResultsToStub(() => new HttpMultipartResultsPublisher(config, stubTraceListener));
+            PublishResultsToStub(() => new HttpMultipartResultsPublisher(config, stubTraceListener.Logger));
             Assert.Equal(SampleProjectName, CProStubNancyModule.ProjectName);
             Assert.Equal(SampleRevision, CProStubNancyModule.Revision);
             Assert.Equal(SampleProfileName, CProStubNancyModule.ProfileName);
