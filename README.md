@@ -9,9 +9,10 @@
     [ ] Configure profile
     [ ] Only publish on CI, except forced
     [ ] Automated smoke test
-    [ ] NuGet package
-    [ ] Release script
+    [x] NuGet package
+    [x] Release script
     [ ] TFS Support
+    [x] Demo project
     [ ] Demo
     [ ] Support scenario outlines
     [ ] Support undefined/skipped(?) result
