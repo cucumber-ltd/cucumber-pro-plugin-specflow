@@ -7,16 +7,20 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
 {
     public class CiEnvironmentResolver
     {
+        private readonly string _ciName;
         private readonly string _revision;
         private readonly string _branch;
         private readonly string _projectName;
 
-        public CiEnvironmentResolver(string revision, string branch, string projectName)
+        public CiEnvironmentResolver(string ciName, string revision, string branch, string projectName)
         {
             _revision = revision;
             _branch = branch;
             _projectName = projectName;
+            _ciName = ciName;
         }
+
+        public bool IsDetected => _ciName != null;
 
         public void Resolve(Config config)
         {
@@ -56,7 +60,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
                 "bamboo_planRepository_revision",
                 "bamboo_repository_git_branch",
                 "bamboo_planRepository_name");
-            return vaules == null ? null : new CiEnvironmentResolver(vaules.Item1, vaules.Item2, vaules.Item3);
+            return vaules == null ? null : new CiEnvironmentResolver("Bamboo", vaules.Item1, vaules.Item2, vaules.Item3);
         }
 
         // https://circleci.com/docs/2.0/env-vars/#circleci-environment-variable-descriptions
@@ -66,7 +70,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
                 "CIRCLE_SHA1",
                 "CIRCLE_BRANCH",
                 "CIRCLE_PROJECT_REPONAME");
-            return vaules == null ? null : new CiEnvironmentResolver(vaules.Item1, vaules.Item2, vaules.Item3);
+            return vaules == null ? null : new CiEnvironmentResolver("Circle", vaules.Item1, vaules.Item2, vaules.Item3);
         }
 
         private static CiEnvironmentResolver DetectJenkins(IDictionary<string, string> env)
@@ -75,7 +79,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
                 "GIT_COMMIT",
                 "GIT_BRANCH",
                 null); // no option for resolving project name?
-            return vaules == null ? null : new CiEnvironmentResolver(vaules.Item1, vaules.Item2, vaules.Item3);
+            return vaules == null ? null : new CiEnvironmentResolver("Jenkins", vaules.Item1, vaules.Item2, vaules.Item3);
         }
 
         // https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables
@@ -89,15 +93,12 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
                 return null;
             var projectRepoSlug = vaules.Item3;
             var projectName = projectRepoSlug?.Split('/').Last();
-            return new CiEnvironmentResolver(vaules.Item1, vaules.Item2, projectName);
+            return new CiEnvironmentResolver("Travis", vaules.Item1, vaules.Item2, projectName);
         }
 
         private static CiEnvironmentResolver CreateLocal(IDictionary<string, string> env)
         {
-            return new CiEnvironmentResolver(
-                "local" + DateTime.Now.ToString("yyyyMMddhhmmss"),
-                null,
-                null);
+            return new CiEnvironmentResolver(null, "local" + DateTime.Now.ToString("yyyyMMddhhmmss"), null, null);
         }
     }
 }

@@ -10,6 +10,7 @@
         public const string CUCUMBERPRO_LOGGING = "cucumberpro.logging";
         public const string CUCUMBERPRO_PROJECTNAME = "cucumberpro.projectname";
         public const string CUCUMBERPRO_PROFILE = "cucumberpro.results.profile";
+        public const string CUCUMBERPRO_RESULTS_PUBLISH = "cucumberpro.results.publish";
 
         // resolved settings
         public const string CUCUMBERPRO_REVISION = "cucumberpro.revision";

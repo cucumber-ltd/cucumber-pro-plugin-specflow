@@ -12,7 +12,12 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration.Loaders
     {
         private readonly IDictionary<string, string> _variables;
 
-        public EnvironmentVariablesConfigLoader() : this(EnvHelper.GetEnvironmentVariables())
+        public EnvironmentVariablesConfigLoader() : this(new EnvironmentVariablesProvider())
+        {
+        }
+
+        public EnvironmentVariablesConfigLoader(IEnvironmentVariablesProvider environmentVariablesProvider)
+            : this(environmentVariablesProvider.GetEnvironmentVariables())
         {
         }
 

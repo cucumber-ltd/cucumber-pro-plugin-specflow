@@ -24,6 +24,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
         private IDictionary<string, string> _envToSend;
         private IResultsPublisher _resultsPublisher;
         private string _profile;
+        private bool _shouldPublish = false;
 
         public JsonReporter(IObjectContainer objectContainer)
         {
@@ -40,17 +41,24 @@ namespace Cucumber.Pro.SpecFlowPlugin
             var config = _objectContainer.Resolve<Config>();
             var traceListener = _objectContainer.Resolve<ITraceListener>();
             var resultsPublisherFactory = _objectContainer.Resolve<ResultsPublisherFactory>();
+            var environmentVariablesProvider = _objectContainer.Resolve<EnvironmentVariablesProvider>();
 
-            Initialize(config, envFilter, traceListener, resultsPublisherFactory, jsonFormatter);
+            Initialize(config, envFilter, traceListener, resultsPublisherFactory, jsonFormatter, environmentVariablesProvider);
         }
 
-        internal void Initialize(Config config, EnvFilter envFilter, ITraceListener traceListener, IResultsPublisherFactory resultsPublisherFactory, JsonFormatter jsonFormatter)
+        internal void Initialize(Config config, EnvFilter envFilter, ITraceListener traceListener, IResultsPublisherFactory resultsPublisherFactory, JsonFormatter jsonFormatter, IEnvironmentVariablesProvider environmentVariablesProvider)
         {
             _jsonFormatter = jsonFormatter;
 
-            var systemEnv = EnvHelper.GetEnvironmentVariables();
+            var systemEnv = environmentVariablesProvider.GetEnvironmentVariables();
             var ciEnvironmentResolver = CiEnvironmentResolver.Detect(systemEnv);
             ciEnvironmentResolver.Resolve(config); // this sets revision, branch
+
+            if (!ciEnvironmentResolver.IsDetected && !IsForcePublish(config))
+            {
+                _shouldPublish = false;
+                return;
+            }
 
             if (config.IsNull(ConfigKeys.CUCUMBERPRO_PROJECTNAME))
                 throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_PROJECTNAME} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_PROJECTNAME)}");
@@ -67,19 +75,31 @@ namespace Cucumber.Pro.SpecFlowPlugin
                 config.GetString(ConfigKeys.CUCUMBERPRO_PROFILE);
 
             _resultsPublisher = resultsPublisherFactory.Create(config, traceListener);
+            _shouldPublish = true;
+        }
+
+        private static bool IsForcePublish(Config config)
+        {
+            return !config.IsNull(ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH) &&
+                config.GetBoolean(ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH);
         }
 
         public void SetEventPublisher(IEventPublisher publisher)
         {
             Initialize();
 
-            _jsonFormatter.SetEventPublisher(publisher);
-
-            publisher.RegisterHandlerFor<TestRunFinishedEvent>(OnTestRunFinished);
+            if (_shouldPublish)
+            {
+                _jsonFormatter.SetEventPublisher(publisher);
+                publisher.RegisterHandlerFor<TestRunFinishedEvent>(OnTestRunFinished);
+            }
         }
 
         internal void OnTestRunFinished(TestRunFinishedEvent e)
         {
+            if (!_shouldPublish)
+                return;
+
             var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
             Debug.Assert(assemblyFolder != null);
             var path = Path.Combine(assemblyFolder, "result.json");

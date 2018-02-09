@@ -8,7 +8,7 @@
     [ ] Publish through a separate tool
     [x] Configure profile
     [ ] Allow specifying custom config file
-    [ ] Only publish on CI, except forced
+    [x] Only publish on CI, except forced
     [ ] Automated smoke test
     [x] NuGet package
     [x] Release script

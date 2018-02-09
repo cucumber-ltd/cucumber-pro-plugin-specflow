@@ -11,7 +11,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
 {
     public class CiEnvironmentResolverTests
     {
-        private static Dictionary<string, string> GetJenkinsEnv()
+        public static Dictionary<string, string> GetJenkinsEnv()
         {
             return new Dictionary<string, string>
             {
@@ -20,7 +20,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             };
         }
 
-        private static Dictionary<string, string> GetCircleEnv()
+        public static Dictionary<string, string> GetCircleEnv()
         {
             return new Dictionary<string, string>
             {
@@ -30,7 +30,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             };
         }
 
-        private static Dictionary<string, string> GetTravisEnv()
+        public static Dictionary<string, string> GetTravisEnv()
         {
             return new Dictionary<string, string>
             {

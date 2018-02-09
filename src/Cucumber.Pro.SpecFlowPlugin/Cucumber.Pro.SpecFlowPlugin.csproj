@@ -62,7 +62,8 @@
     <Compile Include="CucumberProPlugin.cs" />
     <Compile Include="EnvironmentSettings\CiEnvironmentResolver.cs" />
     <Compile Include="EnvironmentSettings\EnvFilter.cs" />
-    <Compile Include="EnvironmentSettings\EnvHelper.cs" />
+    <Compile Include="EnvironmentSettings\EnvironmentVariablesProvider.cs" />
+    <Compile Include="EnvironmentSettings\IEnvironmentVariablesProvider.cs" />
     <Compile Include="Events\EventPublisherHooks.cs" />
     <Compile Include="Events\EventPublisher.cs" />
     <Compile Include="Events\FeatureStartedEvent.cs" />

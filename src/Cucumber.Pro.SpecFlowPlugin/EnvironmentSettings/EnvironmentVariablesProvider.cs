@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
 {
-    public static class EnvHelper
+    public class EnvironmentVariablesProvider : IEnvironmentVariablesProvider
     {
-        public static IDictionary<string, string> GetEnvironmentVariables() =>
+        public IDictionary<string, string> GetEnvironmentVariables() =>
             Environment.GetEnvironmentVariables()
                 .OfType<DictionaryEntry>()
                 .ToDictionary(i => i.Key.ToString(), i => i.Value?.ToString(), StringComparer.InvariantCultureIgnoreCase);

@@ -9,7 +9,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
         [Fact]
         public void Uses_case_insensitive_key_matching()
         {
-            var env = EnvHelper.GetEnvironmentVariables();
+            var env = new EnvironmentVariablesProvider().GetEnvironmentVariables();
             var upperCaseEnv = env.Keys.First(k => k.ToLowerInvariant() != k);
 
             Assert.Equal(env[upperCaseEnv], env[upperCaseEnv.ToLowerInvariant()]);
