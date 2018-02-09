@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
+using Cucumber.Pro.SpecFlowPlugin.Configuration;
 using TechTalk.SpecFlow.Tracing;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Publishing
@@ -20,12 +22,14 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
         private readonly string _url;
         private readonly string _token;
         private readonly ITraceListener _traceListener;
+        private readonly int _timeoutMilliseconds;
 
-        public HttpMultipartResultsPublisher(string url = "https://app.cucumber.pro/tests/results/SpecSol_Test1/master", string token = "fe3e1a5f27789a139a963ff56cddb00816c", ITraceListener traceListener = null)
+        public HttpMultipartResultsPublisher(string url = "https://app.cucumber.pro/tests/results/SpecSol_Test1/master", string token = "fe3e1a5f27789a139a963ff56cddb00816c", ITraceListener traceListener = null, int timeoutMilliseconds = 5000)
         {
             _url = url;
             _token = token;
             _traceListener = traceListener;
+            _timeoutMilliseconds = timeoutMilliseconds;
         }
 
         public void PublishResults(string resultsJsonFilePath, IDictionary<string, string> env, string profileName)
@@ -34,22 +38,58 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             PublishResultsFromContent(resultsJson, env, profileName);
         }
 
+        private bool IsSupportedScheme(Uri uri)
+        {
+            return uri.Scheme.Equals("http", StringComparison.InvariantCultureIgnoreCase) ||
+                   uri.Scheme.Equals("https", StringComparison.InvariantCultureIgnoreCase);
+        }
+
         private void PublishResultsFromContent(string resultsJson, IDictionary<string, string> env, string profileName)
         {
-            var httpClient = new HttpClient();
+            try
+            {
+                if (!Uri.TryCreate(_url, UriKind.Absolute, out var urlUri) || !IsSupportedScheme(urlUri))
+                {
+                    _traceListener?.WriteToolOutput($"Invalid URL for publising results to Cucumber Pro: {_url}");
+                    return;
+                }
 
-            SetupAuthorization(httpClient);
+                var httpClient = new HttpClient();
+                httpClient.Timeout = TimeSpan.FromMilliseconds(_timeoutMilliseconds);
+                SetupAuthorization(httpClient);
 
-            var content = new MultipartFormDataContent();
-            content.Add(new StringContent(profileName), PART_PROFILE_NAME);
-            content.Add(GetEnvContent(env), PART_ENV, "env.txt");
-            content.Add(GetPayloadContent(resultsJson), PART_PAYLOAD, "payload.json");
+                var content = new MultipartFormDataContent();
+                content.Add(new StringContent(profileName), PART_PROFILE_NAME);
+                content.Add(GetEnvContent(env), PART_ENV, "env.txt");
+                content.Add(GetPayloadContent(resultsJson), PART_PAYLOAD, "payload.json");
 
-            var response = httpClient.PostAsync(_url, content).Result;
-            if (response.IsSuccessStatusCode)
-                _traceListener?.WriteToolOutput($"Published results to Cucumber Pro: {_url}");
+                var response = httpClient.PostAsync(urlUri, content).Result;
+                if (response.IsSuccessStatusCode)
+                    _traceListener?.WriteToolOutput($"Published results to Cucumber Pro: {_url}");
+                else
+                {
+                    var responseBody = response.Content.ReadAsStringAsync().Result;
 
-            Console.WriteLine(response);
+                    var suggestion = "";
+                    if ((int) response.StatusCode == 401)
+                        suggestion = $"You need to define {ConfigKeys.CUCUMBERPRO_TOKEN}";
+                    else if ((int) response.StatusCode == 403)
+                        suggestion = $"You need to change the value of {ConfigKeys.CUCUMBERPRO_TOKEN}";
+
+                    var message =
+                        $"Failed to publish results to Cucumber Pro URL: {_url}, Status: {(int) response.StatusCode} {response.ReasonPhrase}{Environment.NewLine}{suggestion}{Environment.NewLine}{responseBody}";
+                    _traceListener?.WriteToolOutput(message);
+                }
+            }
+            catch (Exception timeoutEx) when(timeoutEx is TaskCanceledException ||
+                (timeoutEx is AggregateException && timeoutEx.InnerException is TaskCanceledException))
+            {
+                _traceListener?.WriteToolOutput($"Publishing to Cucumber Pro timed out, consider increasing {ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT} (currently set to {_timeoutMilliseconds})");
+            }
+            catch (Exception ex)
+            {
+                _traceListener?.WriteToolOutput("Unexpected error while publishing results to Cucumber Pro: " + ex);
+            }
         }
 
         private static StringContent GetPayloadContent(string resultsJson)
