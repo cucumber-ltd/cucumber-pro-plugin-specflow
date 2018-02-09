@@ -5,3 +5,15 @@
 # TODO
 
 [ ] Handle results on tags (instead of branches)
+[ ] Publish through a separate tool
+[ ] Configure profile
+[ ] Only publish on CI, except forced
+[ ] Automated smoke test
+[ ] NuGet package
+[ ] Release script
+[ ] TFS Support
+[ ] Demo
+[ ] Support scenario outlines
+[ ] Support undefined/skipped(?) result
+[ ] Support background(?)
+[ ] Support parallel run
