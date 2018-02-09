@@ -18,6 +18,9 @@
         // https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables
         public const string TRAVIS_REPO_SLUG = "TRAVIS_REPO_SLUG";
 
+        // resolved settings
+        public const string CUCUMBERPRO_REVISION = "cucumberpro.revision";
+
         public static Config CreateDefaultConfig()
         {
             var config = new Config();

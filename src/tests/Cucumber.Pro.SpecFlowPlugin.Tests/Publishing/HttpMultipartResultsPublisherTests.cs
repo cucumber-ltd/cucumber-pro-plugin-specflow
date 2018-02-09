@@ -100,6 +100,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
         static readonly Dictionary<string, string> SampleEnv = new Dictionary<string, string> { { "env1", "value1" }, { "env2", "value2" } };
         const string SampleProfileName = "my-profile";
         const string SampleToken = "my-token";
+        private const string SampleProjectName = "prj";
+        private const string SampleRevision = "rev1";
         private readonly StubTraceListener stubTraceListener;
 
         public HttpMultipartResultsPublisherTests(ITestOutputHelper testOutputHelper)
@@ -108,9 +110,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             stubTraceListener = new StubTraceListener(_testOutputHelper);
         }
 
-        const string SampleUrl = "http://localhost:8082/tests/results/prj/rev1";
+        const string SampleUrl = "http://localhost:8082/tests/results/" + SampleProjectName + "/" + SampleRevision;
 
-        private void PublishResultsToStub(int timeout = 5000, bool checkInvoked = true)
+        private void PublishResultsToStub(int timeout = 5000, bool checkInvoked = true, Func<HttpMultipartResultsPublisher> publisherFactory = null)
         {
             var tempFile = Path.GetTempFileName();
             File.WriteAllText(tempFile, SampleJson);
@@ -121,7 +123,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             {
                 nancyHost.Start();
 
-                var publisher = new HttpMultipartResultsPublisher(SampleUrl, SampleToken, stubTraceListener, timeout);
+                var publisher = publisherFactory != null ? publisherFactory() :
+                    new HttpMultipartResultsPublisher(SampleUrl, SampleToken, stubTraceListener, timeout);
                 publisher.PublishResults(tempFile, SampleEnv, SampleProfileName);
             }
 
@@ -134,8 +137,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
         {
             CProStubNancyModule.Reset();
             PublishResultsToStub();
-            Assert.Equal("prj", CProStubNancyModule.ProjectName);
-            Assert.Equal("rev1", CProStubNancyModule.Revision);
+            Assert.Equal(SampleProjectName, CProStubNancyModule.ProjectName);
+            Assert.Equal(SampleRevision, CProStubNancyModule.Revision);
             Assert.Equal(SampleProfileName, CProStubNancyModule.ProfileName);
             Assert.Equal(SampleEnv, CProStubNancyModule.Env);
             Assert.Equal(SampleJson, CProStubNancyModule.Json);
@@ -194,6 +197,25 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             Assert.Contains(stubTraceListener.ToolOutput, msg => msg.Contains("Cucumber Pro"));
             Assert.Contains(stubTraceListener.ToolOutput, msg => msg.Contains("timed out"));
             Assert.Contains(stubTraceListener.ToolOutput, msg => msg.Contains(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT));
+        }
+
+        [Fact]
+        public void Can_read_from_config()
+        {
+            var config = ConfigKeys.CreateDefaultConfig();
+            config.Set(ConfigKeys.CUCUMBERPRO_URL, "http://localhost:8082/");
+            config.Set(ConfigKeys.CUCUMBERPRO_PROJECTNAME, SampleProjectName);
+            config.Set(ConfigKeys.CUCUMBERPRO_REVISION, SampleRevision);
+            config.Set(ConfigKeys.CUCUMBERPRO_TOKEN, SampleToken);
+            config.Set(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT, 5000);
+
+            CProStubNancyModule.Reset();
+            PublishResultsToStub(0, true, () => new HttpMultipartResultsPublisher(config, stubTraceListener));
+            Assert.Equal(SampleProjectName, CProStubNancyModule.ProjectName);
+            Assert.Equal(SampleRevision, CProStubNancyModule.Revision);
+            Assert.Equal(SampleProfileName, CProStubNancyModule.ProfileName);
+            Assert.Equal(SampleEnv, CProStubNancyModule.Env);
+            Assert.Equal(SampleJson, CProStubNancyModule.Json);
         }
     }
 }

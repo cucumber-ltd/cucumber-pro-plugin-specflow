@@ -8,24 +8,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
 {
     public class NullValue : IValue
     {
-        public string GetString()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool GetBoolean()
-        {
-            throw new NotImplementedException();
-        }
-
-        public int GetInt()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsNull()
-        {
-            return true;
-        }
+        public string GetString() => null;
+        public bool GetBoolean() => false;
+        public int GetInt() => 0;
+        public bool IsNull() => true;
     }
 }
