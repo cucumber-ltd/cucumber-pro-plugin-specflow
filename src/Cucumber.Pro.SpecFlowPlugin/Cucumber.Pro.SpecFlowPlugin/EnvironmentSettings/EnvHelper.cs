@@ -12,6 +12,6 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
         public static IDictionary<string, string> GetEnvironmentVariables() =>
             Environment.GetEnvironmentVariables()
                 .OfType<DictionaryEntry>()
-                .ToDictionary(i => i.Key.ToString(), i => i.Value?.ToString());
+                .ToDictionary(i => i.Key.ToString(), i => i.Value?.ToString(), StringComparer.InvariantCultureIgnoreCase);
     }
 }

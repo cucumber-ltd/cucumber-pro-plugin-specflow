@@ -20,6 +20,7 @@
 
         // resolved settings
         public const string CUCUMBERPRO_REVISION = "cucumberpro.revision";
+        public const string CUCUMBERPRO_BRANCH = "cucumberpro.git.branch";
 
         public static Config CreateDefaultConfig()
         {
@@ -36,6 +37,11 @@
             config.SetNull(CIRCLE_PROJECT_REPONAME);
             config.SetNull(TRAVIS_REPO_SLUG);
             return config;
+        }
+
+        public static string GetEnvVarName(string key)
+        {
+            return key.Replace('.', '_').ToUpperInvariant();
         }
     }
 }

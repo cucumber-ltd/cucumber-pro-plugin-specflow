@@ -22,6 +22,8 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("073873ef-7722-4e78-acab-2f5d27a73f90")]
 
+[assembly: InternalsVisibleTo("Cucumber.Pro.SpecFlowPlugin.Tests")]
+
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version

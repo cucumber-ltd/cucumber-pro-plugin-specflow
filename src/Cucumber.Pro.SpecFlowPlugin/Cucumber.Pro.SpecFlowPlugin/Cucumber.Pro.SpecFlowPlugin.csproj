@@ -34,6 +34,7 @@
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -59,6 +60,7 @@
     <Compile Include="Configuration\RealValue.cs" />
     <Compile Include="Configuration\Value.cs" />
     <Compile Include="CucumberProPlugin.cs" />
+    <Compile Include="EnvironmentSettings\CiEnvironmentResolver.cs" />
     <Compile Include="EnvironmentSettings\EnvFilter.cs" />
     <Compile Include="EnvironmentSettings\EnvHelper.cs" />
     <Compile Include="Events\EventPublisherHooks.cs" />
@@ -83,6 +85,7 @@
     <Compile Include="Publishing\CucumberProResultsUrlBuilder.cs" />
     <Compile Include="Publishing\HttpMultipartResultsPublisher.cs" />
     <Compile Include="Publishing\IResultsPublisher.cs" />
+    <Compile Include="Publishing\IResultsPublisherFactory.cs" />
     <Compile Include="Publishing\NullResultsPublisher.cs" />
     <Compile Include="Publishing\ResultsPublisherFactory.cs" />
   </ItemGroup>
