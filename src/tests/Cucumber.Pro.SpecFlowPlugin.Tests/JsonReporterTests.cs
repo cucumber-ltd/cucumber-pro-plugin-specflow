@@ -79,7 +79,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
         }
 
         [Fact]
-        public void Sets_cucumber_pro_git_branch()
+        public void Sets_git_branch()
         {
             var reporter = new JsonReporter(null);
             var config = CreateUsualConfig();
@@ -89,7 +89,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
 
             _resultsPublisherMock.Verify(p =>
                 p.PublishResults(It.IsAny<string>(),
-                It.Is((IDictionary<string, string> env) => env.ContainsKey("cucumber_pro_git_branch")),
+                It.Is((IDictionary<string, string> env) => env.ContainsKey("GIT_BRANCH")),
                 It.IsAny<string>()));
         }
 
