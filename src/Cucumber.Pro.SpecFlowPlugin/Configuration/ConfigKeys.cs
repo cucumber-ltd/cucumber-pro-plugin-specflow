@@ -8,9 +8,8 @@
         public const string CUCUMBERPRO_CONNECTION_TIMEOUT = "cucumberpro.connection.timeout";
         public const string CUCUMBERPRO_ENVMASK = "cucumberpro.envmask";
         public const string CUCUMBERPRO_LOGGING = "cucumberpro.logging";
-
-        // Project name
         public const string CUCUMBERPRO_PROJECTNAME = "cucumberpro.projectname";
+        public const string CUCUMBERPRO_PROFILE = "cucumberpro.results.profile";
 
         // resolved settings
         public const string CUCUMBERPRO_REVISION = "cucumberpro.revision";

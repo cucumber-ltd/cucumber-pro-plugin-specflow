@@ -16,12 +16,14 @@ namespace Cucumber.Pro.SpecFlowPlugin
 {
     public class JsonReporter : IFormatter
     {
+        private const string DEFAULT_PROFILE = "default";
         private const string CUCUMBERPRO_GIT_BRANCH_SEND = "cucumber_pro_git_branch"; // should be ConfigKeys.CUCUMBERPRO_BRANCH
 
         private readonly IObjectContainer _objectContainer;
         private JsonFormatter _jsonFormatter;
         private IDictionary<string, string> _envToSend;
         private IResultsPublisher _resultsPublisher;
+        private string _profile;
 
         public JsonReporter(IObjectContainer objectContainer)
         {
@@ -60,6 +62,10 @@ namespace Cucumber.Pro.SpecFlowPlugin
                     throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_BRANCH} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_BRANCH)}");
                 _envToSend[CUCUMBERPRO_GIT_BRANCH_SEND] = config.GetString(ConfigKeys.CUCUMBERPRO_BRANCH);
             }
+
+            _profile = config.IsNull(ConfigKeys.CUCUMBERPRO_PROFILE) ? DEFAULT_PROFILE :
+                config.GetString(ConfigKeys.CUCUMBERPRO_PROFILE);
+
             _resultsPublisher = resultsPublisherFactory.Create(config, traceListener);
         }
 
@@ -79,7 +85,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
             var path = Path.Combine(assemblyFolder, "result.json");
             File.WriteAllText(path, _jsonFormatter.GetJson());
 
-            _resultsPublisher.PublishResults(path, _envToSend, "default");
+            _resultsPublisher.PublishResults(path, _envToSend, _profile);
         }
     }
 }

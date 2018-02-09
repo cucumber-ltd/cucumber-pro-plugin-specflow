@@ -31,12 +31,20 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
                 new JsonFormatter(traceListener));
         }
 
+        private static Config CreateUsualConfig()
+        {
+            var config = ConfigKeys.CreateDefaultConfig();
+            config.Set(ConfigKeys.CUCUMBERPRO_BRANCH, "branch1");
+            config.Set(ConfigKeys.CUCUMBERPRO_PROJECTNAME, "myproject");
+            return config;
+        }
+
         [Fact]
         public void Throws_when_branch_cannot_be_detected()
         {
             var reporter = new JsonReporter(null);
-            var config = ConfigKeys.CreateDefaultConfig();
-            config.Set(ConfigKeys.CUCUMBERPRO_PROJECTNAME, "myproject");
+            var config = CreateUsualConfig();
+            config.SetNull(ConfigKeys.CUCUMBERPRO_BRANCH);
 
             Assert.Throws<ConfigurationErrorsException>(() =>
                 InitializeReporter(reporter, config));
@@ -46,8 +54,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
         public void Throws_when_projectname_cannot_be_detected()
         {
             var reporter = new JsonReporter(null);
-            var config = ConfigKeys.CreateDefaultConfig();
-            config.Set(ConfigKeys.CUCUMBERPRO_BRANCH, "branch1");
+            var config = CreateUsualConfig();
+            config.SetNull(ConfigKeys.CUCUMBERPRO_PROJECTNAME);
 
             Assert.Throws<ConfigurationErrorsException>(() =>
                 InitializeReporter(reporter, config));
@@ -57,9 +65,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
         public void Sets_cucumber_pro_git_branch()
         {
             var reporter = new JsonReporter(null);
-            var config = ConfigKeys.CreateDefaultConfig();
-            config.Set(ConfigKeys.CUCUMBERPRO_BRANCH, "branch1");
-            config.Set(ConfigKeys.CUCUMBERPRO_PROJECTNAME, "myproject");
+            var config = CreateUsualConfig();
 
             InitializeReporter(reporter, config);
             reporter.OnTestRunFinished(new TestRunFinishedEvent());
@@ -68,6 +74,38 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
                 p.PublishResults(It.IsAny<string>(),
                 It.Is((IDictionary<string, string> env) => env.ContainsKey("cucumber_pro_git_branch")),
                 It.IsAny<string>()));
+        }
+
+        [Fact]
+        public void Sets_profile_from_config()
+        {
+            var reporter = new JsonReporter(null);
+            var config = CreateUsualConfig();
+            config.Set(ConfigKeys.CUCUMBERPRO_PROFILE, "myprofile");
+
+            InitializeReporter(reporter, config);
+            reporter.OnTestRunFinished(new TestRunFinishedEvent());
+
+            resultsPublisherMock.Verify(p =>
+                p.PublishResults(It.IsAny<string>(),
+                It.IsAny<IDictionary<string, string>>(),
+                "myprofile"));
+        }
+
+        [Fact]
+        public void Uses_default_profile_if_not_configured()
+        {
+            var reporter = new JsonReporter(null);
+            var config = CreateUsualConfig();
+            config.SetNull(ConfigKeys.CUCUMBERPRO_PROFILE);
+
+            InitializeReporter(reporter, config);
+            reporter.OnTestRunFinished(new TestRunFinishedEvent());
+
+            resultsPublisherMock.Verify(p =>
+                p.PublishResults(It.IsAny<string>(),
+                It.IsAny<IDictionary<string, string>>(),
+                "default"));
         }
     }
 }

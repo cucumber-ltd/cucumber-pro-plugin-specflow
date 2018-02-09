@@ -6,7 +6,8 @@
 
     [ ] Handle results on tags (instead of branches)
     [ ] Publish through a separate tool
-    [ ] Configure profile
+    [x] Configure profile
+    [ ] Allow specifying custom config file
     [ ] Only publish on CI, except forced
     [ ] Automated smoke test
     [x] NuGet package
@@ -21,3 +22,7 @@
     [ ] Convert feature file paths to relative
     [ ] readme.txt of the NuGet package
     [ ] icon, texts, etc of NuGet package
+
+# Questions
+
+- How to configure profile (now: from config file)
