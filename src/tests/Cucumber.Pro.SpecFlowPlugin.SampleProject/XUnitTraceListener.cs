@@ -27,12 +27,16 @@ namespace Cucumber.Pro.SpecFlowPlugin.SampleProject
         {
             var testOutputHelper = GetTestOutputHelper();
             testOutputHelper?.WriteLine(message);
+            if (testOutputHelper == null)
+                Console.WriteLine(message);
         }
 
         public void WriteToolOutput(string message)
         {
             var testOutputHelper = GetTestOutputHelper();
             testOutputHelper?.WriteLine(">>> " + message);
+            if (testOutputHelper == null)
+                Console.WriteLine(">>> " + message);
         }
     }
 }

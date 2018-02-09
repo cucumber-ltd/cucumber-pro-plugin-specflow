@@ -17,6 +17,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.SampleProject.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "2.2.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+    [Xunit.TraitAttribute("Category", "smoke")]
     public partial class EatingCucumbersFeature : Xunit.IClassFixture<EatingCucumbersFeature.FixtureData>, System.IDisposable
     {
         
@@ -36,7 +37,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.SampleProject.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Eating cucumbers", null, ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Eating cucumbers", null, ProgrammingLanguage.CSharp, new string[] {
+                        "smoke"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -74,18 +76,18 @@ namespace Cucumber.Pro.SpecFlowPlugin.SampleProject.Features
         [Xunit.FactAttribute(DisplayName="Many cucumbers")]
         [Xunit.TraitAttribute("FeatureTitle", "Eating cucumbers")]
         [Xunit.TraitAttribute("Description", "Many cucumbers")]
-        [Xunit.TraitAttribute("Category", "smoke")]
+        [Xunit.TraitAttribute("Category", "sample")]
         public virtual void ManyCucumbers()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Many cucumbers", new string[] {
-                        "smoke"});
-#line 4
-  this.ScenarioSetup(scenarioInfo);
+                        "sample"});
 #line 5
-    testRunner.Given("I have already eaten 99 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+  this.ScenarioSetup(scenarioInfo);
 #line 6
-    testRunner.When("I eat 47 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.Given("I have already eaten 99 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 7
+    testRunner.When("I eat 47 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 8
     testRunner.Then("I should have 52 cucumbers in my belly", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -97,13 +99,13 @@ namespace Cucumber.Pro.SpecFlowPlugin.SampleProject.Features
         public virtual void FewCucumbers()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Few cucumbers", ((string[])(null)));
-#line 9
-  this.ScenarioSetup(scenarioInfo);
 #line 10
-    testRunner.Given("I have already eaten 5 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+  this.ScenarioSetup(scenarioInfo);
 #line 11
-    testRunner.When("I eat 2 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.Given("I have already eaten 5 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 12
+    testRunner.When("I eat 2 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 13
     testRunner.Then("I should have 7 cucumbers in my belly", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();

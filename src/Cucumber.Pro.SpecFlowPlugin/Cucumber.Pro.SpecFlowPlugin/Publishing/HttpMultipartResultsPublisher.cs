@@ -25,14 +25,14 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
         private readonly int _timeoutMilliseconds;
 
         public HttpMultipartResultsPublisher(Config config, ITraceListener traceListener) : this(
+            traceListener,
             CucumberProResultsUrlBuilder.BuildCucumberProUrl(config),
             config.GetString(ConfigKeys.CUCUMBERPRO_TOKEN),
-            traceListener,
             config.GetInteger(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT))
         {
         }
 
-        public HttpMultipartResultsPublisher(string url = "https://app.cucumber.pro/tests/results/SpecSol_Test1/master", string token = "fe3e1a5f27789a139a963ff56cddb00816c", ITraceListener traceListener = null, int timeoutMilliseconds = 5000)
+        public HttpMultipartResultsPublisher(ITraceListener traceListener, string url, string token, int timeoutMilliseconds)
         {
             _url = url;
             _token = token;

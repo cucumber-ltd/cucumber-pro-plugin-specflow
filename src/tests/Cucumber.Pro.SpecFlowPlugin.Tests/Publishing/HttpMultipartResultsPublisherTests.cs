@@ -112,7 +112,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
 
         const string SampleUrl = "http://localhost:8082/tests/results/" + SampleProjectName + "/" + SampleRevision;
 
-        private void PublishResultsToStub(int timeout = 5000, bool checkInvoked = true, Func<HttpMultipartResultsPublisher> publisherFactory = null)
+        private void PublishResultsToStub(Func<HttpMultipartResultsPublisher> publisherFactory = null, int timeout = 5000, bool checkInvoked = true)
         {
             var tempFile = Path.GetTempFileName();
             File.WriteAllText(tempFile, SampleJson);
@@ -124,7 +124,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
                 nancyHost.Start();
 
                 var publisher = publisherFactory != null ? publisherFactory() :
-                    new HttpMultipartResultsPublisher(SampleUrl, SampleToken, stubTraceListener, timeout);
+                    new HttpMultipartResultsPublisher(stubTraceListener, url: SampleUrl, token: SampleToken, timeoutMilliseconds: timeout);
                 publisher.PublishResults(tempFile, SampleEnv, SampleProfileName);
             }
 
@@ -193,7 +193,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
         public void Handles_timeout()
         {
             CProStubNancyModule.Reset(200, waitMilliseconds: 100);
-            PublishResultsToStub(5, checkInvoked: false);
+            PublishResultsToStub(timeout: 5, checkInvoked: false);
             Assert.Contains(stubTraceListener.ToolOutput, msg => msg.Contains("Cucumber Pro"));
             Assert.Contains(stubTraceListener.ToolOutput, msg => msg.Contains("timed out"));
             Assert.Contains(stubTraceListener.ToolOutput, msg => msg.Contains(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT));
@@ -210,7 +210,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             config.Set(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT, 5000);
 
             CProStubNancyModule.Reset();
-            PublishResultsToStub(0, true, () => new HttpMultipartResultsPublisher(config, stubTraceListener));
+            PublishResultsToStub(() => new HttpMultipartResultsPublisher(config, stubTraceListener));
             Assert.Equal(SampleProjectName, CProStubNancyModule.ProjectName);
             Assert.Equal(SampleRevision, CProStubNancyModule.Revision);
             Assert.Equal(SampleProfileName, CProStubNancyModule.ProfileName);

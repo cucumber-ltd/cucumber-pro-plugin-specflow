@@ -1,6 +1,7 @@
-﻿Feature: Eating cucumbers
+﻿@smoke
+Feature: Eating cucumbers
 
-  @smoke
+  @sample
   Scenario: Many cucumbers
     Given I have already eaten 99 cucumbers
     When I eat 47 cucumbers
