@@ -22,21 +22,30 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
         private readonly string _token;
         private readonly ILogger _logger;
         private readonly int _timeoutMilliseconds;
+        private readonly string _revision;
+        private readonly string _branch;
+        private readonly string _tag;
 
         public HttpSingleJsonResultsPublisher(Config config, ILogger logger) : this(
             logger,
             CucumberProResultsUrlBuilder.BuildCucumberProUrl(config),
             config.GetString(ConfigKeys.CUCUMBERPRO_TOKEN),
-            config.GetInteger(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT))
+            config.GetInteger(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT),
+            config.GetString(ConfigKeys.CUCUMBERPRO_REVISION),
+            config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH),
+            null) //TODO: tag
         {
         }
 
-        public HttpSingleJsonResultsPublisher(ILogger logger, string url, string token, int timeoutMilliseconds)
+        public HttpSingleJsonResultsPublisher(ILogger logger, string url, string token, int timeoutMilliseconds, string revision, string branch, string tag)
         {
             _url = url;
             _token = token;
             _logger = logger;
             _timeoutMilliseconds = timeoutMilliseconds;
+            _revision = revision;
+            _branch = branch;
+            _tag = tag;
         }
 
         private bool IsSupportedScheme(Uri uri)
@@ -45,12 +54,19 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
                    uri.Scheme.Equals("https", StringComparison.InvariantCultureIgnoreCase);
         }
 
+        class GitSettings
+        {
+            public string Revision { get; set; }
+            public string Branch { get; set; }
+            public string Tag { get; set; }
+        }
+
         class ResultsPackage
         {
             public IDictionary<string, string> Environment { get; set; }
             public List<FeatureResult> CucumberJson { get; set; }
             public string ProfileName { get; set; }
-            //git
+            public GitSettings Git { get; set; }
         }
 
         private string GetSingleJsonContent(List<FeatureResult> featureResults, IDictionary<string, string> env, string profileName)
@@ -59,7 +75,13 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             {
                 Environment = env,
                 CucumberJson = featureResults,
-                ProfileName = profileName
+                ProfileName = profileName,
+                Git = new GitSettings
+                {
+                    Branch = _branch,
+                    Revision = _revision,
+                    Tag = _tag
+                }
             };
             var serializerSettings = JsonFormatter.GetJsonSerializerSettings(_logger.Level >= TraceLevel.Verbose);
             return JsonConvert.SerializeObject(resultsPackage, serializerSettings);

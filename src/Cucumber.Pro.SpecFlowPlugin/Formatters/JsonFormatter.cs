@@ -216,7 +216,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
         public static JsonSerializerSettings GetJsonSerializerSettings(bool indented)
         {
             var serializerSettings = new JsonSerializerSettings();
-            serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            var contractResolver = new CamelCasePropertyNamesContractResolver();
+            contractResolver.NamingStrategy.ProcessDictionaryKeys = false;
+            serializerSettings.ContractResolver = contractResolver;
             serializerSettings.Converters = new List<JsonConverter> {new StringEnumConverter {CamelCaseText = true}};
             serializerSettings.Formatting = indented ? Formatting.Indented : Formatting.None;
             serializerSettings.NullValueHandling = NullValueHandling.Ignore;
