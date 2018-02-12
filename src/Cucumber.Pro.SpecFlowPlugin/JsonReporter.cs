@@ -51,8 +51,34 @@ namespace Cucumber.Pro.SpecFlowPlugin
         internal void Initialize(Config config, EnvFilter envFilter, IResultsPublisherFactory resultsPublisherFactory, JsonFormatter jsonFormatter, IEnvironmentVariablesProvider environmentVariablesProvider, ILogger logger)
         {
             _jsonFormatter = jsonFormatter;
+            _shouldPublish = true;
 
             var systemEnv = environmentVariablesProvider.GetEnvironmentVariables();
+            DetectCiEnvironmentSettings(config, systemEnv, logger);
+
+            if (!_shouldPublish)
+                return;
+
+            VerifyConfig(config, systemEnv);
+
+            ConfigureResultsFile(config, logger);
+            ConfigureGitRepositoryRoot(config, logger);
+            ConfigureEnvToSend(config, envFilter, systemEnv);
+            ConfigureProfile(config);
+
+            _resultsPublisher = resultsPublisherFactory.Create(config, logger);
+        }
+
+        private void VerifyConfig(Config config, IDictionary<string, string> systemEnv)
+        {
+            if (config.IsNull(ConfigKeys.CUCUMBERPRO_PROJECTNAME))
+                throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_PROJECTNAME} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_PROJECTNAME)}");
+            if (!systemEnv.ContainsKey(GIT_BRANCH_SEND) && config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_BRANCH))
+                throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_GIT_BRANCH} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_GIT_BRANCH)}");
+        }
+
+        private void DetectCiEnvironmentSettings(Config config, IDictionary<string, string> systemEnv, ILogger logger)
+        {
             var ciEnvironmentResolver = CiEnvironmentResolver.Detect(systemEnv);
             ciEnvironmentResolver.Resolve(config); // this sets revision, branch
 
@@ -63,39 +89,48 @@ namespace Cucumber.Pro.SpecFlowPlugin
                 return;
             }
             logger.Log(TraceLevel.Info, $"Cucumber Pro plugin detected CI environment as '{ciEnvironmentResolver.CiName}'");
+        }
 
-            if (config.IsNull(ConfigKeys.CUCUMBERPRO_PROJECTNAME))
-                throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_PROJECTNAME} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_PROJECTNAME)}");
+        private void ConfigureResultsFile(Config config, ILogger logger)
+        {
+            if (config.IsNull(ConfigKeys.CUCUMBERPRO_RESULTS_FILE))
+                return;
 
-            if (!config.IsNull(ConfigKeys.CUCUMBERPRO_RESULTS_FILE))
-            {
-                var fileName = Environment.ExpandEnvironmentVariables(config.GetString(ConfigKeys.CUCUMBERPRO_RESULTS_FILE));
-                var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath) ??
-                    Directory.GetCurrentDirectory(); // in the very rare case the assembly folder cannot be detected, we use current directory
+            var fileName = Environment.ExpandEnvironmentVariables(config.GetString(ConfigKeys.CUCUMBERPRO_RESULTS_FILE));
+            var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath) ??
+                Directory.GetCurrentDirectory(); // in the very rare case the assembly folder cannot be detected, we use current directory
 
-                _resultsOutputFilePath = Path.Combine(assemblyFolder, fileName);
-                logger.Log(TraceLevel.Info, $"Saving Cucumber Pro results file to '{_resultsOutputFilePath}'.");
-            }
+            _resultsOutputFilePath = Path.Combine(assemblyFolder, fileName);
+            logger.Log(TraceLevel.Info, $"Saving Cucumber Pro results file to '{_resultsOutputFilePath}'.");
+        }
 
+        private void ConfigureGitRepositoryRoot(Config config, ILogger logger)
+        {
             if (!config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_REPOSITORYROOT))
             {
-                logger.Log(TraceLevel.Verbose, $"CPro: Using '{config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REPOSITORYROOT)}' as repository root.");
+                logger.Log(TraceLevel.Verbose,
+                    $"CPro: Using '{config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REPOSITORYROOT)}' as repository root.");
                 _jsonFormatter.SetPathBaseFolder(config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REPOSITORYROOT));
             }
+        }
 
+        private void ConfigureEnvToSend(Config config, EnvFilter envFilter, IDictionary<string, string> systemEnv)
+        {
             _envToSend = envFilter.Filter(systemEnv);
             if (!_envToSend.ContainsKey(GIT_BRANCH_SEND))
             {
-                if (config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_BRANCH))
-                    throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_GIT_BRANCH} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_GIT_BRANCH)}");
-                _envToSend[GIT_BRANCH_SEND] = config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH);
+                // we have verified already that it should be either in the system env or in the config
+                _envToSend[GIT_BRANCH_SEND] = systemEnv.ContainsKey(GIT_BRANCH_SEND)
+                    ? systemEnv[GIT_BRANCH_SEND]
+                    : config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH);
             }
+        }
 
-            _profile = config.IsNull(ConfigKeys.CUCUMBERPRO_PROFILE) ? DEFAULT_PROFILE :
-                config.GetString(ConfigKeys.CUCUMBERPRO_PROFILE);
-
-            _resultsPublisher = resultsPublisherFactory.Create(config, logger);
-            _shouldPublish = true;
+        private void ConfigureProfile(Config config)
+        {
+            _profile = config.IsNull(ConfigKeys.CUCUMBERPRO_PROFILE)
+                ? DEFAULT_PROFILE
+                : config.GetString(ConfigKeys.CUCUMBERPRO_PROFILE);
         }
 
         private static bool IsForcePublish(Config config)
