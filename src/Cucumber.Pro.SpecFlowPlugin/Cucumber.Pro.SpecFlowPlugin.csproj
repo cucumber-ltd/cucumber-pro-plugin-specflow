@@ -90,6 +90,7 @@
     <Compile Include="Publishing\IResultsPublisher.cs" />
     <Compile Include="Publishing\IResultsPublisherFactory.cs" />
     <Compile Include="Publishing\NullResultsPublisher.cs" />
+    <Compile Include="Publishing\ResultsPublisherExtensions.cs" />
     <Compile Include="Publishing\ResultsPublisherFactory.cs" />
   </ItemGroup>
   <ItemGroup>

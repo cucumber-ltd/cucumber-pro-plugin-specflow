@@ -41,19 +41,13 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             _timeoutMilliseconds = timeoutMilliseconds;
         }
 
-        public void PublishResults(string resultsJsonFilePath, IDictionary<string, string> env, string profileName)
-        {
-            var resultsJson = File.ReadAllText(resultsJsonFilePath);
-            PublishResultsFromContent(resultsJson, env, profileName);
-        }
-
         private bool IsSupportedScheme(Uri uri)
         {
             return uri.Scheme.Equals("http", StringComparison.InvariantCultureIgnoreCase) ||
                    uri.Scheme.Equals("https", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        private void PublishResultsFromContent(string resultsJson, IDictionary<string, string> env, string profileName)
+        public void PublishResultsFromContent(string resultsJson, IDictionary<string, string> env, string profileName)
         {
             try
             {
