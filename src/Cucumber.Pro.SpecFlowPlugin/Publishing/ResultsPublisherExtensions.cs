@@ -25,7 +25,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             var serializerSettings = JsonFormatter.GetJsonSerializerSettings(false);
 
             var featureResults = JsonConvert.DeserializeObject<List<FeatureResult>>(resultsJson, serializerSettings);
-            resultsPublisher.PublishResultsFromContent(featureResults, env, profileName);
+            resultsPublisher.PublishResults(featureResults, env, profileName);
         }
     }
 }

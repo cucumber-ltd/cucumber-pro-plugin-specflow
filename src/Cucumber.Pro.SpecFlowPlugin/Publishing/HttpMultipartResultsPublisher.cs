@@ -50,7 +50,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
                    uri.Scheme.Equals("https", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public void PublishResultsFromContent(List<FeatureResult> featureResults, IDictionary<string, string> env, string profileName)
+        public void PublishResults(List<FeatureResult> featureResults, IDictionary<string, string> env, string profileName)
         {
             try
             {

@@ -5,6 +5,6 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
 {
     public interface IResultsPublisher
     {
-        void PublishResultsFromContent(List<FeatureResult> resultsJson, IDictionary<string, string> env, string profileName);
+        void PublishResults(List<FeatureResult> resultsJson, IDictionary<string, string> env, string profileName);
     }
 }

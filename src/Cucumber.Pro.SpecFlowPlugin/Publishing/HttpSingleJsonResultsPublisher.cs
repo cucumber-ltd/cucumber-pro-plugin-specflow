@@ -65,7 +65,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             return JsonConvert.SerializeObject(resultsPackage, serializerSettings);
         }
 
-        public void PublishResultsFromContent(List<FeatureResult> resultsJson, IDictionary<string, string> env, string profileName)
+        public void PublishResults(List<FeatureResult> resultsJson, IDictionary<string, string> env, string profileName)
         {
             try
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using BoDi;
 using Cucumber.Pro.SpecFlowPlugin.Configuration;
@@ -157,12 +158,15 @@ namespace Cucumber.Pro.SpecFlowPlugin
             if (!_shouldPublish)
                 return;
 
-            var jsonContent = _jsonFormatter.GetJson(_logger.Level >= TraceLevel.Verbose);
+            var featureResults = _jsonFormatter.FeatureResults.ToList();
 
             if (_resultsOutputFilePath != null)
+            {
+                var jsonContent = _jsonFormatter.GetJson(_logger.Level >= TraceLevel.Verbose);
                 File.WriteAllText(_resultsOutputFilePath, jsonContent);
+            }
 
-            _resultsPublisher.PublishResultsFromContent(jsonContent, _envToSend, _profile);
+            _resultsPublisher.PublishResults(featureResults, _envToSend, _profile);
         }
     }
 }
