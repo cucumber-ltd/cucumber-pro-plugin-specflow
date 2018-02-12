@@ -29,7 +29,7 @@
     [x] Use temp results.json file by default
     [ ] TFS Build Line++ issue
     [ ] Replace Cucumber.Java with SpecFlow content type
-    [ ] Setup myget for build results
+    [x] Build NuGet from CI
 
 # Questions
 
