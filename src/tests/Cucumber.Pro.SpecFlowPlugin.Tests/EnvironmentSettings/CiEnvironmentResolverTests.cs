@@ -48,7 +48,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             var config = ConfigKeys.CreateDefaultConfig();
             resolver.Resolve(config);
 
-            Assert.Equal("branch1", config.GetString(ConfigKeys.CUCUMBERPRO_BRANCH));
+            Assert.Equal("branch1", config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH));
         }
 
         [Fact]
@@ -90,10 +90,10 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             var resolver = CiEnvironmentResolver.Detect(GetJenkinsEnv());
 
             var config = ConfigKeys.CreateDefaultConfig();
-            config.Set(ConfigKeys.CUCUMBERPRO_BRANCH, "overriden-branch");
+            config.Set(ConfigKeys.CUCUMBERPRO_GIT_BRANCH, "overriden-branch");
             resolver.Resolve(config);
 
-            Assert.Equal("overriden-branch", config.GetString(ConfigKeys.CUCUMBERPRO_BRANCH));
+            Assert.Equal("overriden-branch", config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH));
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             var config = ConfigKeys.CreateDefaultConfig();
             resolver.Resolve(config);
 
-            Assert.True(config.IsNull(ConfigKeys.CUCUMBERPRO_BRANCH));
+            Assert.True(config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_BRANCH));
         }
 
         [Fact]

@@ -11,10 +11,11 @@
         public const string CUCUMBERPRO_PROJECTNAME = "cucumberpro.projectname";
         public const string CUCUMBERPRO_PROFILE = "cucumberpro.results.profile";
         public const string CUCUMBERPRO_RESULTS_PUBLISH = "cucumberpro.results.publish";
+        public const string CUCUMBERPRO_RESULTS_FILE = "cucumberpro.results.file";
 
         // resolved settings
         public const string CUCUMBERPRO_REVISION = "cucumberpro.revision";
-        public const string CUCUMBERPRO_BRANCH = "cucumberpro.git.branch";
+        public const string CUCUMBERPRO_GIT_BRANCH = "cucumberpro.git.branch";
         public const string CUCUMBERPRO_GIT_REPOSITORYROOT = "cucumberpro.git.repositoryroot";
 
         public static Config CreateDefaultConfig()

@@ -36,3 +36,12 @@
     # in a CI environment. We recommend setting this to true only if you are experimenting with
     # the configuration locally.
     publish:
+
+    # Saves the test results JSON file to the specified file path. If omitted the results will be
+    # published wihtout saving them to a file.
+    # The file path can be absolute or relative to the test assembly. Environment variables can also
+    # be used with the syntax: %TEMP%\results.json.
+    file:
+
+    # Sets the execution profile for publishing the results. If omitted the value "default" is used.
+    profile:

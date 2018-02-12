@@ -88,9 +88,6 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
 
         private void PublishResultsToStub(Func<HttpMultipartResultsPublisher> publisherFactory = null, int timeout = 5000, bool checkInvoked = true)
         {
-            var tempFile = Path.GetTempFileName();
-            File.WriteAllText(tempFile, SampleJson);
-
             var hostConfiguration = new HostConfiguration {RewriteLocalhost = false};
             using (var nancyHost = new NancyHost(new Uri("http://localhost:8082/tests/results/"),
                 NancyBootstrapperLocator.Bootstrapper, hostConfiguration))
@@ -99,7 +96,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
 
                 var publisher = publisherFactory != null ? publisherFactory() :
                     new HttpMultipartResultsPublisher(stubTraceListener.Logger, url: SampleUrl, token: SampleToken, timeoutMilliseconds: timeout);
-                publisher.PublishResults(tempFile, SampleEnv, SampleProfileName);
+                publisher.PublishResultsFromContent(SampleJson, SampleEnv, SampleProfileName);
             }
 
             if (checkInvoked)

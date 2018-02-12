@@ -23,7 +23,10 @@ namespace Cucumber.Pro.SpecFlowPlugin
         private IDictionary<string, string> _envToSend;
         private IResultsPublisher _resultsPublisher;
         private string _profile;
+        private string _resultsOutputFilePath;
         private bool _shouldPublish = false;
+
+        internal string ResultsOutputFilePath => _resultsOutputFilePath;
 
         public JsonReporter(IObjectContainer objectContainer)
         {
@@ -64,6 +67,16 @@ namespace Cucumber.Pro.SpecFlowPlugin
             if (config.IsNull(ConfigKeys.CUCUMBERPRO_PROJECTNAME))
                 throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_PROJECTNAME} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_PROJECTNAME)}");
 
+            if (!config.IsNull(ConfigKeys.CUCUMBERPRO_RESULTS_FILE))
+            {
+                var fileName = Environment.ExpandEnvironmentVariables(config.GetString(ConfigKeys.CUCUMBERPRO_RESULTS_FILE));
+                var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath) ??
+                    Directory.GetCurrentDirectory(); // in the very rare case the assembly folder cannot be detected, we use current directory
+
+                _resultsOutputFilePath = Path.Combine(assemblyFolder, fileName);
+                logger.Log(TraceLevel.Info, $"Saving Cucumber Pro results file to '{_resultsOutputFilePath}'.");
+            }
+
             if (!config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_REPOSITORYROOT))
             {
                 logger.Log(TraceLevel.Verbose, $"CPro: Using '{config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REPOSITORYROOT)}' as repository root.");
@@ -73,9 +86,9 @@ namespace Cucumber.Pro.SpecFlowPlugin
             _envToSend = envFilter.Filter(systemEnv);
             if (!_envToSend.ContainsKey(GIT_BRANCH_SEND))
             {
-                if (config.IsNull(ConfigKeys.CUCUMBERPRO_BRANCH))
-                    throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_BRANCH} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_BRANCH)}");
-                _envToSend[GIT_BRANCH_SEND] = config.GetString(ConfigKeys.CUCUMBERPRO_BRANCH);
+                if (config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_BRANCH))
+                    throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_GIT_BRANCH} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_GIT_BRANCH)}");
+                _envToSend[GIT_BRANCH_SEND] = config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH);
             }
 
             _profile = config.IsNull(ConfigKeys.CUCUMBERPRO_PROFILE) ? DEFAULT_PROFILE :
@@ -107,12 +120,12 @@ namespace Cucumber.Pro.SpecFlowPlugin
             if (!_shouldPublish)
                 return;
 
-            var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
-            Debug.Assert(assemblyFolder != null);
-            var path = Path.Combine(assemblyFolder, "result.json");
-            File.WriteAllText(path, _jsonFormatter.GetJson());
+            var jsonContent = _jsonFormatter.GetJson();
 
-            _resultsPublisher.PublishResults(path, _envToSend, _profile);
+            if (_resultsOutputFilePath != null)
+                File.WriteAllText(_resultsOutputFilePath, jsonContent);
+
+            _resultsPublisher.PublishResultsFromContent(jsonContent, _envToSend, _profile);
         }
     }
 }

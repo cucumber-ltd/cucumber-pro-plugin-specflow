@@ -23,11 +23,15 @@
     [x] Convert feature file paths to relative
     [ ] readme.txt of the NuGet package
     [ ] icon, texts, etc of NuGet package
-    [ ] Configure results.json file
-    [ ] Use temp results.json file by default
+    [x] Configure results.json file
+    [x] Use temp results.json file by default
     [ ] TFS Build Line++ issue
 
 # Questions
 
 - How to configure profile (now: from config file)
 - Should we use INFO as default log level?
+- How to configure the case, when you want to publish the results to a file, but not send them up?
+- Setting cucumberpro.connection.ignoreerror cannot be applied
+- Cannot override file-based config setting with ENV
+
