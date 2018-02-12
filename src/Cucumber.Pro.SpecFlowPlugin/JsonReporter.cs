@@ -19,6 +19,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
         private const string GIT_BRANCH_SEND = "GIT_BRANCH";
 
         private readonly IObjectContainer _objectContainer;
+        private ILogger _logger;
         private JsonFormatter _jsonFormatter;
         private IDictionary<string, string> _envToSend;
         private IResultsPublisher _resultsPublisher;
@@ -51,6 +52,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
         internal void Initialize(Config config, EnvFilter envFilter, IResultsPublisherFactory resultsPublisherFactory, JsonFormatter jsonFormatter, IEnvironmentVariablesProvider environmentVariablesProvider, ILogger logger)
         {
             _jsonFormatter = jsonFormatter;
+            _logger = logger;
             _shouldPublish = true;
 
             var systemEnv = environmentVariablesProvider.GetEnvironmentVariables();
@@ -155,7 +157,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
             if (!_shouldPublish)
                 return;
 
-            var jsonContent = _jsonFormatter.GetJson();
+            var jsonContent = _jsonFormatter.GetJson(_logger.Level >= TraceLevel.Verbose);
 
             if (_resultsOutputFilePath != null)
                 File.WriteAllText(_resultsOutputFilePath, jsonContent);

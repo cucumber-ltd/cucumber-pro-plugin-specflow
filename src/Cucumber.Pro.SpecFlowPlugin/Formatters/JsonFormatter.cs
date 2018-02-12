@@ -187,7 +187,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             };
         }
 
-        public string GetJson()
+        public string GetJson(bool indented = false)
         {
             var serializerSettings = new JsonSerializerSettings();
             serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
