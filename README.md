@@ -17,9 +17,10 @@
     [x] Verbose logging
     [ ] Demo
     [ ] Support scenario outlines
-    [ ] Support undefined/skipped(?) result
+    [ ] Support undefined/skipped/pending(?) result
     [ ] Support background(?)
     [ ] Support hooks (errors in hooks)
+    [ ] Support step timings
     [x] Support parallel run
     [x] Convert feature file paths to relative
     [ ] readme.txt of the NuGet package
@@ -27,6 +28,8 @@
     [x] Configure results.json file
     [x] Use temp results.json file by default
     [ ] TFS Build Line++ issue
+    [ ] Replace Cucumber.Java with SpecFlow content type
+    [ ] Setup myget for build results
 
 # Questions
 
@@ -35,4 +38,5 @@
 - How to configure the case, when you want to publish the results to a file, but not send them up?
 - Setting cucumberpro.connection.ignoreerror cannot be applied
 - Cannot override file-based config setting with ENV
+- How to release, how to release prelim versions?
 
