@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -32,8 +31,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             config.GetString(ConfigKeys.CUCUMBERPRO_TOKEN),
             config.GetInteger(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT),
             config.GetString(ConfigKeys.CUCUMBERPRO_REVISION),
-            config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH),
-            null) //TODO: tag
+            config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_BRANCH) ? null : config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH),
+            config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_TAG) ? null : config.GetString(ConfigKeys.CUCUMBERPRO_GIT_TAG))
         {
         }
 

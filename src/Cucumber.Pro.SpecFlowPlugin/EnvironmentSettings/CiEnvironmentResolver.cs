@@ -14,14 +14,21 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
         private readonly string _branch;
         private readonly string _projectName;
         private readonly string _repositoryRoot;
+        private readonly string _tag;
 
-        public CiEnvironmentResolver(string ciName, string revision, string branch, string projectName, string repositoryRoot = null)
+        private CiEnvironmentResolver(string ciName, Tuple<string, string, string, string, string> values)
+            : this(ciName, values.Item1, values.Item2, values.Item3, values.Item4, values.Item5)
+        {
+        }
+
+        public CiEnvironmentResolver(string ciName, string revision, string branch, string projectName, string repositoryRoot, string tag)
         {
             _revision = revision;
             _branch = branch;
             _projectName = projectName;
             _ciName = ciName;
             _repositoryRoot = repositoryRoot;
+            _tag = tag;
         }
 
         public bool IsDetected => _ciName != null;
@@ -31,6 +38,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
         {
             SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_REVISION, _revision);
             SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_GIT_BRANCH, _branch);
+            SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_GIT_TAG, _tag);
             SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_PROJECTNAME, _projectName);
             SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_GIT_REPOSITORYROOT, _repositoryRoot ?? DetectRepositoryRoot());
         }
@@ -68,12 +76,22 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
                 CreateLocal(env);
         }
 
-        private static Tuple<string, string, string, string> GetEnvValues(IDictionary<string, string> env, string revisionKey, string branchKey, string projectNameKey, string repositoryRootKey = null)
+        private static string GetOrNull(IDictionary<string, string> env, string key)
+        {
+            return key == null || !env.TryGetValue(key, out var value) ? null : value;
+        }
+
+        private static Tuple<string, string, string, string, string> GetEnvValues(IDictionary<string, string> env, string revisionKey, string branchKey, string projectNameKey, string repositoryRootKey, string tagKey)
         {
             if (!env.ContainsKey(revisionKey))
                 return null;
 
-            return new Tuple<string, string, string, string>(env[revisionKey], env[branchKey], projectNameKey == null ? null : env[projectNameKey], repositoryRootKey == null ? null : env[repositoryRootKey]);
+            return new Tuple<string, string, string, string, string>(
+                GetOrNull(env, revisionKey),
+                GetOrNull(env, branchKey),
+                GetOrNull(env, projectNameKey),
+                GetOrNull(env, repositoryRootKey),
+                GetOrNull(env, tagKey));
         }
 
         // https://confluence.atlassian.com/bamboo/bamboo-variables-289277087.html
@@ -82,8 +100,10 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
             var vaules = GetEnvValues(env,
                 "bamboo_planRepository_revision",
                 "bamboo_repository_git_branch",
-                "bamboo_planRepository_name");
-            return vaules == null ? null : new CiEnvironmentResolver("Bamboo", vaules.Item1, vaules.Item2, vaules.Item3);
+                "bamboo_planRepository_name",
+                "bamboo_build_working_directory", // repo root
+                null); // tag
+            return vaules == null ? null : new CiEnvironmentResolver("Bamboo", vaules);
         }
 
         // https://circleci.com/docs/2.0/env-vars/#circleci-environment-variable-descriptions
@@ -92,8 +112,10 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
             var vaules = GetEnvValues(env,
                 "CIRCLE_SHA1",
                 "CIRCLE_BRANCH",
-                "CIRCLE_PROJECT_REPONAME");
-            return vaules == null ? null : new CiEnvironmentResolver("Circle", vaules.Item1, vaules.Item2, vaules.Item3);
+                "CIRCLE_PROJECT_REPONAME",
+                "CIRCLE_WORKING_DIRECTORY", // repo root
+                "CIRCLE_TAG");
+            return vaules == null ? null : new CiEnvironmentResolver("Circle", vaules);
         }
 
         private static CiEnvironmentResolver DetectJenkins(IDictionary<string, string> env)
@@ -101,8 +123,10 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
             var vaules = GetEnvValues(env,
                 "GIT_COMMIT",
                 "GIT_BRANCH",
-                null); // no option for resolving project name?
-            return vaules == null ? null : new CiEnvironmentResolver("Jenkins", vaules.Item1, vaules.Item2, vaules.Item3);
+                null, // no option for resolving project name?
+                null, // repo root
+                "GIT_TAG_NAME"); 
+            return vaules == null ? null : new CiEnvironmentResolver("Jenkins", vaules);
         }
 
         // https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables
@@ -111,12 +135,14 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
             var vaules = GetEnvValues(env,
                 "TRAVIS_COMMIT",
                 "TRAVIS_BRANCH",
-                "TRAVIS_REPO_SLUG");
+                "TRAVIS_REPO_SLUG",
+                "TRAVIS_BUILD_DIR", // repo root
+                "TRAVIS_TAG"); // tag name
             if (vaules == null)
                 return null;
             var projectRepoSlug = vaules.Item3;
             var projectName = projectRepoSlug?.Split('/').Last();
-            return new CiEnvironmentResolver("Travis", vaules.Item1, vaules.Item2, projectName);
+            return new CiEnvironmentResolver("Travis", vaules.Item1, vaules.Item2, projectName, vaules.Item4, vaules.Item5);
         }
 
         // https://docs.microsoft.com/en-us/vsts/build-release/concepts/definitions/build/variables?tabs=batch#predefined-variables
@@ -126,13 +152,14 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
                 "BUILD_BUILDNUMBER",
                 "BUILD_SOURCEBRANCHNAME",
                 "SYSTEM_TEAMPROJECT",
-                "BUILD_REPOSITORY_LOCALPATH");
-            return vaules == null ? null : new CiEnvironmentResolver("TFS", vaules.Item1, vaules.Item2, vaules.Item3, vaules.Item4);
+                "BUILD_REPOSITORY_LOCALPATH",
+                null); // tag name
+            return vaules == null ? null : new CiEnvironmentResolver("TFS", vaules);
         }
 
         private static CiEnvironmentResolver CreateLocal(IDictionary<string, string> env)
         {
-            return new CiEnvironmentResolver(null, "local" + DateTime.Now.ToString("yyyyMMddhhmmss"), null, null);
+            return new CiEnvironmentResolver(null, "local" + DateTime.Now.ToString("yyyyMMddhhmmss"), null, null, null, null);
         }
     }
 }

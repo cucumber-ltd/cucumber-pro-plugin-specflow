@@ -4,7 +4,7 @@
 
 # TODO
 
-    [ ] Handle results on tags (instead of branches)
+    [x] Handle results on tags (instead of branches)
     [ ] Publish through a separate tool
     [x] Configure profile
     [ ] Allow specifying custom config file
@@ -42,6 +42,7 @@
 - Max length for error message, entire json?
 - Including skipped scenario steps (after a failing step): Is this necessary - we don't have them by default.
 - Background steps are reported as normal steps, but with a line number pointing to the background step. Ok?
+- Skip publishing for pull requests?
 
 # Known Issues
 
