@@ -1,10 +1,5 @@
 @pushd %~dp0
 
-@if "%NUGET_LOCAL_FEED%" == "" (
-	@echo NUGET_LOCAL_FEED environment variable is not defined!
-	@exit /b
-)
-
 set NUGET_LOCAL_FEED=%1
 set VERSION=%2
 set PKGVER=%2%3
