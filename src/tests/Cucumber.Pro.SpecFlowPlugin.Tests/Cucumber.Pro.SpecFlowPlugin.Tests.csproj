@@ -87,6 +87,7 @@
     <Compile Include="EnvironmentSettings\CiEnvironmentResolverTests.cs" />
     <Compile Include="EnvironmentSettings\EnvFilterTests.cs" />
     <Compile Include="EnvironmentSettings\EnvHelperTests.cs" />
+    <Compile Include="Formatters\JsonFormatterTests.cs" />
     <Compile Include="JsonReporterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Publishing\HttpMultipartResultsPublisherTests.cs" />

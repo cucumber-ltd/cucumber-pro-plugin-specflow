@@ -20,6 +20,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
         private FeatureResult _currentFeatureResult = null;
         private string _pathBaseFolder = null;
 
+        internal IEnumerable<FeatureResult> FeatureResults => _featureResults;
+
         public JsonFormatter(ITraceListener traceListener)
         {
             _traceListener = traceListener;

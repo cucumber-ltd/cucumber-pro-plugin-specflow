@@ -19,6 +19,7 @@
     [ ] Support scenario outlines
     [ ] Support undefined/skipped(?) result
     [ ] Support background(?)
+    [ ] Support hooks (errors in hooks)
     [ ] Support parallel run
     [x] Convert feature file paths to relative
     [ ] readme.txt of the NuGet package
