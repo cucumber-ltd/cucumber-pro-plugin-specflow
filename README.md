@@ -17,7 +17,7 @@
     [x] Verbose logging
     [ ] Demo
     [ ] Support scenario outlines
-    [ ] Support undefined/skipped/pending(?) result
+    [x] Support undefined/skipped/pending(?) result
     [ ] Support background(?)
     [ ] Support hooks (errors in hooks)
     [ ] Support step timings
@@ -39,4 +39,9 @@
 - Setting cucumberpro.connection.ignoreerror cannot be applied
 - Cannot override file-based config setting with ENV
 - How to release, how to release prelim versions?
+- Max length for error message, entire json?
+- Including skipped scenario steps (after a failing step): Is this necessary - we don't have them by default.
 
+# Known Issues
+
+- No line number for undefined steps

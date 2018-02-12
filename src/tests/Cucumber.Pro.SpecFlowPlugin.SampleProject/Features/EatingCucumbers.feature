@@ -20,3 +20,17 @@ Feature: Eating cucumbers
     | a | b | c |
     | 5 | 2 | 7 |
     | 6 | 2 | 8 |
+
+
+Scenario: Undefined cucumbers
+    Given I have already eaten 5 cucumbers
+    When there is an undefined step
+
+Scenario: Pending cucumbers
+    Given I have already eaten 5 cucumbers
+    When there is a pending step
+
+Scenario: Skipped cucumbers
+    Given I have already eaten 5 cucumbers
+    When there is an error
+    Then the last step is skipped

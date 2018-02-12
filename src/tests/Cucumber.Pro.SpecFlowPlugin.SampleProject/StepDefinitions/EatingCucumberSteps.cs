@@ -41,5 +41,22 @@ namespace Cucumber.Pro.SpecFlowPlugin.SampleProject.StepDefinitions
         {
             Assert.Equal(expectedCount, _belly.EatenCucumbers);
         }
+
+        [When(@"there is a pending step")]
+        public void WhenThereIsAPendingStep()
+        {
+            ScenarioContext.Current.Pending();
+        }
+
+        [When(@"there is an error")]
+        public void WhenThereIsAnError()
+        {
+            throw new Exception("simulated error");
+        }
+
+        [Then(@"the last step is skipped")]
+        public void ThenTheLastStepIsSkipped()
+        {
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using BoDi;
@@ -94,6 +95,10 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
             var testErrorProperty = scenarioContext.GetType().GetProperty(nameof(ScenarioContext.TestError));
             Assert.NotNull(testErrorProperty);
             testErrorProperty.SetValue(scenarioContext, error);
+
+            var testStatusProperty = scenarioContext.GetType().GetProperty("TestStatus", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.NotNull(testStatusProperty);
+            testStatusProperty.SetValue(scenarioContext, error is PendingStepException ? TestStatus.StepDefinitionPending : TestStatus.TestError);
         }
 
         private JsonFormatter CreateJsonFormatter()
@@ -198,6 +203,25 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
             var stepResult = AssertStepResult(formatter);
             Assert.Equal(ResultStatus.Failed, stepResult.Result?.Status);
             Assert.StartsWith(error.ToString().Substring(0, 20), stepResult.Result?.ErrorMessage);
+        }
+
+        [Fact]
+        public void Collects_pending_step_result()
+        {
+            var formatter = CreateJsonFormatter();
+            var eventPublisher = new EventPublisher();
+            formatter.SetEventPublisher(eventPublisher);
+
+            var featureContext = CreateFeatureContext("Feature1");
+            var scenarioContext = CreateScenarioContext("Scenario1");
+
+            PublishScenarioStart(eventPublisher, featureContext, scenarioContext);
+            var error = new PendingStepException();
+            PublishStep(eventPublisher, CreateStepContext(StepDefinitionType.Given, "there is something"), scenarioContext, error);
+            PublishScenarioFinish(eventPublisher, featureContext, scenarioContext);
+
+            var stepResult = AssertStepResult(formatter);
+            Assert.Equal(ResultStatus.Pending, stepResult.Result?.Status);
         }
 
         [Fact]

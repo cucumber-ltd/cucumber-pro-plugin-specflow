@@ -4,6 +4,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters.JsonModel
     {
         Unknown,
         Passed,
-        Failed
+        Failed,
+        Undefined,
+        Pending
     }
 }

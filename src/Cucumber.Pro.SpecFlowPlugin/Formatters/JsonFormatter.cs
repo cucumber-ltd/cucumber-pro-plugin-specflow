@@ -3,12 +3,15 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Cucumber.Pro.SpecFlowPlugin.Events;
 using Cucumber.Pro.SpecFlowPlugin.Formatters.JsonModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Bindings;
+using TechTalk.SpecFlow.Infrastructure;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 {
@@ -40,6 +43,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             publisher.RegisterHandlerFor(new RuntimeEventHandler<FeatureStartedEvent>(OnFeatureStarted));
             publisher.RegisterHandlerFor(new RuntimeEventHandler<ScenarioStartedEvent>(OnScenarioStarted));
             publisher.RegisterHandlerFor(new RuntimeEventHandler<StepFinishedEvent>(OnStepFinished));
+            publisher.RegisterHandlerFor(new RuntimeEventHandler<ScenarioFinishedEvent>(OnScenarioFinished));
         }
 
         private string GetFeatureKey(string featureFilePath, FeatureContext featureContext)
@@ -108,24 +112,79 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             e.ScenarioContext[TESTCASE_RESULT_KEY] = testCaseResult;
         }
 
+        private ResultStatus GetResultStatus(ScenarioContext scenarioContext)
+        {
+            var testStatusProperty = scenarioContext.GetType().GetProperty("TestStatus", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (testStatusProperty == null)
+                return scenarioContext.TestError == null ? ResultStatus.Passed : ResultStatus.Failed;
+
+            switch ((TestStatus)testStatusProperty.GetValue(scenarioContext))
+            {
+                case TestStatus.TestError:
+                    return ResultStatus.Failed;
+                case TestStatus.BindingError:
+                    return ResultStatus.Failed;
+                case TestStatus.MissingStepDefinition:
+                    return ResultStatus.Undefined;
+                case TestStatus.StepDefinitionPending:
+                    return ResultStatus.Pending;
+                case TestStatus.OK:
+                    return ResultStatus.Passed;
+                default:
+                    return ResultStatus.Unknown;
+            }
+        }
+
         private void OnStepFinished(StepFinishedEvent e)
         {
             var testCaseResult = (TestCaseResult)e.ScenarioContext[TESTCASE_RESULT_KEY];
+            var stepLine = _featureFileLocationProvider.GetStepLine(e.StepContext.StepInfo.StepInstance);
 
+            RegisterStepResult(testCaseResult, e.StepContext.StepInfo.StepInstance, e.ScenarioContext, stepLine);
+        }
+
+        private void RegisterStepResult(TestCaseResult testCaseResult, StepInstance stepInstance, ScenarioContext scenarioContext, int? stepLine)
+        {
             var stepResult = new StepResult
             {
-                Line = _featureFileLocationProvider.GetStepLine(e.StepContext) ?? 0,
-                Keyword = e.StepContext.StepInfo.StepInstance.Keyword,
-                Name = e.StepContext.StepInfo.Text,
+                Line = stepLine ?? 0,
+                Keyword = stepInstance.Keyword,
+                Name = stepInstance.Text,
                 Result = new Result
                 {
                     Duration = 0, //TODO
-                    Status = e.ScenarioContext.TestError == null ? ResultStatus.Passed : ResultStatus.Failed,
-                    ErrorMessage = e.ScenarioContext.TestError?.ToString()
-                        //TODO: max length of error message
+                    Status = GetResultStatus(scenarioContext),
+                    ErrorMessage = scenarioContext.TestError?.ToString()
                 }
             };
             testCaseResult.StepResults.Add(stepResult);
+        }
+
+        private void OnScenarioFinished(ScenarioFinishedEvent e)
+        {
+            var testCaseResult = (TestCaseResult)e.ScenarioContext[TESTCASE_RESULT_KEY];
+
+            var status = GetResultStatus(e.ScenarioContext);
+            if (status == ResultStatus.Undefined)
+            {
+                var missingStepsProperty = e.ScenarioContext.GetType().GetProperty("MissingSteps", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (missingStepsProperty != null)
+                {
+                    var missingSteps = (IEnumerable<StepInstance>)missingStepsProperty.GetValue(e.ScenarioContext);
+                    foreach (var stepInstance in missingSteps)
+                    {
+                        var stepLine = _featureFileLocationProvider.GetStepLine(stepInstance);
+                        RegisterStepResult(testCaseResult, stepInstance, e.ScenarioContext, stepLine);
+                    }
+                }
+            }
+
+            testCaseResult.Result = new Result
+            {
+                Duration = 0, //TODO
+                Status = status,
+                ErrorMessage = e.ScenarioContext.TestError?.ToString()
+            };
         }
 
         public string GetJson()

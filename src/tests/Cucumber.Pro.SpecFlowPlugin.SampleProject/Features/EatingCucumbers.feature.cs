@@ -131,6 +131,56 @@ namespace Cucumber.Pro.SpecFlowPlugin.SampleProject.Features
             this.ScenarioCleanup();
         }
         
+        [Xunit.FactAttribute(DisplayName="Undefined cucumbers")]
+        [Xunit.TraitAttribute("FeatureTitle", "Eating cucumbers")]
+        [Xunit.TraitAttribute("Description", "Undefined cucumbers")]
+        public virtual void UndefinedCucumbers()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Undefined cucumbers", ((string[])(null)));
+#line 25
+this.ScenarioSetup(scenarioInfo);
+#line 26
+    testRunner.Given("I have already eaten 5 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 27
+    testRunner.When("there is an undefined step", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Pending cucumbers")]
+        [Xunit.TraitAttribute("FeatureTitle", "Eating cucumbers")]
+        [Xunit.TraitAttribute("Description", "Pending cucumbers")]
+        public virtual void PendingCucumbers()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Pending cucumbers", ((string[])(null)));
+#line 29
+this.ScenarioSetup(scenarioInfo);
+#line 30
+    testRunner.Given("I have already eaten 5 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 31
+    testRunner.When("there is a pending step", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Skipped cucumbers")]
+        [Xunit.TraitAttribute("FeatureTitle", "Eating cucumbers")]
+        [Xunit.TraitAttribute("Description", "Skipped cucumbers")]
+        public virtual void SkippedCucumbers()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Skipped cucumbers", ((string[])(null)));
+#line 33
+this.ScenarioSetup(scenarioInfo);
+#line 34
+    testRunner.Given("I have already eaten 5 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 35
+    testRunner.When("there is an error", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 36
+    testRunner.Then("the last step is skipped", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "2.2.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

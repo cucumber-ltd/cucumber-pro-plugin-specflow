@@ -8,6 +8,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters.JsonModel
         public int Line { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
+        public Result Result { get; set; }
 
         [JsonProperty("steps")]
         public List<StepResult> StepResults { get; } = new List<StepResult>();

@@ -38,6 +38,12 @@ namespace Cucumber.Pro.SpecFlowPlugin.Events
             _eventPublisher.Send(new ScenarioStartedEvent(_contextManager.ScenarioContext, _contextManager.FeatureContext));
         }
 
+        [AfterScenario]
+        public void AfterScenario()
+        {
+            _eventPublisher.Send(new ScenarioFinishedEvent(_contextManager.ScenarioContext, _contextManager.FeatureContext));
+        }
+
         [AfterStep]
         public void AfterStep()
         {

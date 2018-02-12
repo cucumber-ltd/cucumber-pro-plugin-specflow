@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Bindings;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 {
@@ -19,6 +20,6 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
         public string GetFeatureFilePath(FeatureContext featureContext) => GetFeatureFileFrame()?.GetFileName();
         public int? GetScenarioLine(ScenarioContext scenarioContext) => GetCurrentFeatureFileLine();
-        public int? GetStepLine(ScenarioStepContext scenarioStepContext) => GetCurrentFeatureFileLine();
+        public int? GetStepLine(StepInstance stepInstance) => GetCurrentFeatureFileLine();
     }
 }

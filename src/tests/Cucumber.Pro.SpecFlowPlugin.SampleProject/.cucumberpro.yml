@@ -6,7 +6,7 @@
 
   # Sets the log level to one of `DEBUG`, `INFO`, `WARN`, `ERROR` or `FATAL`. Defaults to `WARN`.
   # Setting it to `DEBUG` will also print the current configuration when the plugin runs.
-  logging: warn
+  logging: debug
 
   # Not needed if the build is running on a preferred CI server and the Cucumber Pro project 
   # name is identical to the CI server project name. Define this environment variable to override 
@@ -39,3 +39,5 @@
     # in a CI environment. We recommend setting this to true only if you are experimenting with
     # the configuration locally.
     publish: true
+
+    file: "%TEMP%\\cpro_result.json"
