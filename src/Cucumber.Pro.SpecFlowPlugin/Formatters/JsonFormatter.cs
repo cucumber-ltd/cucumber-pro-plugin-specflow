@@ -209,13 +209,18 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
         public string GetJson(bool indented = false)
         {
+            var serializerSettings = GetJsonSerializerSettings(indented);
+            return JsonConvert.SerializeObject(FeatureResults, serializerSettings);
+        }
+
+        public static JsonSerializerSettings GetJsonSerializerSettings(bool indented)
+        {
             var serializerSettings = new JsonSerializerSettings();
             serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             serializerSettings.Converters = new List<JsonConverter> {new StringEnumConverter {CamelCaseText = true}};
-            serializerSettings.Formatting = Formatting.Indented;
+            serializerSettings.Formatting = indented ? Formatting.Indented : Formatting.None;
             serializerSettings.NullValueHandling = NullValueHandling.Ignore;
-
-            return JsonConvert.SerializeObject(FeatureResults, serializerSettings);
+            return serializerSettings;
         }
     }
 }

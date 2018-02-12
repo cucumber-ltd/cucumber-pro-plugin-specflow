@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Cucumber.Pro.SpecFlowPlugin.Configuration;
 using Cucumber.Pro.SpecFlowPlugin.Publishing;
 using Nancy;
@@ -26,6 +27,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             public static Dictionary<string, string> Env;
             public static int ExpectedResponseCode = 200;
             public static int WaitMilliseconds = 0;
+
+            public static string NormalizedJson => Json == null ? null : Regex.Replace(Json, @"\s+", "");
 
             public static void Reset(int expectedResponseCode = 200, int waitMilliseconds = 0)
             {
@@ -70,7 +73,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
 
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
 
-        const string SampleJson = @"[{ ""name"": ""Eating cucumbers""}]";
+        const string SampleJson = @"[{""name"":""Eating_cucumbers"",""elements"":[]}]"; // no whitespaces!
         static readonly Dictionary<string, string> SampleEnv = new Dictionary<string, string> { { "env1", "value1" }, { "env2", "value2" } };
         const string SampleProfileName = "my-profile";
         const string SampleToken = "my-token";
@@ -112,7 +115,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             Assert.Equal(SampleRevision, CProStubNancyModule.Revision);
             Assert.Equal(SampleProfileName, CProStubNancyModule.ProfileName);
             Assert.Equal(SampleEnv, CProStubNancyModule.Env);
-            Assert.Equal(SampleJson, CProStubNancyModule.Json);
+            Assert.Equal(SampleJson, CProStubNancyModule.NormalizedJson);
         }
 
         [Fact]
@@ -186,7 +189,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             Assert.Equal(SampleRevision, CProStubNancyModule.Revision);
             Assert.Equal(SampleProfileName, CProStubNancyModule.ProfileName);
             Assert.Equal(SampleEnv, CProStubNancyModule.Env);
-            Assert.Equal(SampleJson, CProStubNancyModule.Json);
+            Assert.Equal(SampleJson, CProStubNancyModule.NormalizedJson);
         }
     }
 }

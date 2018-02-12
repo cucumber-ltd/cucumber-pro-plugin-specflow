@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,15 +10,11 @@ using Cucumber.Pro.SpecFlowPlugin.Configuration;
 using Cucumber.Pro.SpecFlowPlugin.Formatters;
 using Cucumber.Pro.SpecFlowPlugin.Formatters.JsonModel;
 using Newtonsoft.Json;
-using TechTalk.SpecFlow.Tracing;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Publishing
 {
-    public class HttpMultipartResultsPublisher : IResultsPublisher
+    public class HttpSingleJsonResultsPublisher : IResultsPublisher
     {
-        private const string PART_ENV = "env";
-        private const string PART_PAYLOAD = "payload";
-        private const string PART_PROFILE_NAME = "profileName";
         private const string CONTENT_TYPE_CUCUMBER_JAVA_RESULTS_JSON = "application/x.cucumber.java.results+json";
         private const string CONTENT_TYPE_SPECFLOW_RESULTS_JSON = CONTENT_TYPE_CUCUMBER_JAVA_RESULTS_JSON; // "application/x.specflow.results+json";
 
@@ -28,7 +23,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
         private readonly ILogger _logger;
         private readonly int _timeoutMilliseconds;
 
-        public HttpMultipartResultsPublisher(Config config, ILogger logger) : this(
+        public HttpSingleJsonResultsPublisher(Config config, ILogger logger) : this(
             logger,
             CucumberProResultsUrlBuilder.BuildCucumberProUrl(config),
             config.GetString(ConfigKeys.CUCUMBERPRO_TOKEN),
@@ -36,7 +31,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
         {
         }
 
-        public HttpMultipartResultsPublisher(ILogger logger, string url, string token, int timeoutMilliseconds)
+        public HttpSingleJsonResultsPublisher(ILogger logger, string url, string token, int timeoutMilliseconds)
         {
             _url = url;
             _token = token;
@@ -50,7 +45,27 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
                    uri.Scheme.Equals("https", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public void PublishResultsFromContent(List<FeatureResult> featureResults, IDictionary<string, string> env, string profileName)
+        class ResultsPackage
+        {
+            public IDictionary<string, string> Environment { get; set; }
+            public List<FeatureResult> CucumberJson { get; set; }
+            public string ProfileName { get; set; }
+            //git
+        }
+
+        private string GetSingleJsonContent(List<FeatureResult> featureResults, IDictionary<string, string> env, string profileName)
+        {
+            var resultsPackage = new ResultsPackage
+            {
+                Environment = env,
+                CucumberJson = featureResults,
+                ProfileName = profileName
+            };
+            var serializerSettings = JsonFormatter.GetJsonSerializerSettings(_logger.Level >= TraceLevel.Verbose);
+            return JsonConvert.SerializeObject(resultsPackage, serializerSettings);
+        }
+
+        public void PublishResultsFromContent(List<FeatureResult> resultsJson, IDictionary<string, string> env, string profileName)
         {
             try
             {
@@ -64,10 +79,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
                 httpClient.Timeout = TimeSpan.FromMilliseconds(_timeoutMilliseconds);
                 SetupAuthorization(httpClient);
 
-                var content = new MultipartFormDataContent();
-                content.Add(new StringContent(profileName), PART_PROFILE_NAME);
-                content.Add(GetEnvContent(env), PART_ENV, "env.txt");
-                content.Add(GetPayloadContent(featureResults), PART_PAYLOAD, "payload.json");
+                var content = new StringContent(GetSingleJsonContent(resultsJson, env, profileName),
+                    Encoding.UTF8, CONTENT_TYPE_SPECFLOW_RESULTS_JSON);
 
                 DumpDebugInfo(content);
 
@@ -79,17 +92,17 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
                     var responseBody = response.Content.ReadAsStringAsync().Result;
 
                     var suggestion = "";
-                    if ((int) response.StatusCode == 401)
+                    if ((int)response.StatusCode == 401)
                         suggestion = $"You need to define {ConfigKeys.CUCUMBERPRO_TOKEN}";
-                    else if ((int) response.StatusCode == 403)
+                    else if ((int)response.StatusCode == 403)
                         suggestion = $"You need to change the value of {ConfigKeys.CUCUMBERPRO_TOKEN}";
 
                     var message =
-                        $"Failed to publish results to Cucumber Pro URL: {_url}, Status: {(int) response.StatusCode} {response.ReasonPhrase}{Environment.NewLine}{suggestion}{Environment.NewLine}{responseBody}";
+                        $"Failed to publish results to Cucumber Pro URL: {_url}, Status: {(int)response.StatusCode} {response.ReasonPhrase}{Environment.NewLine}{suggestion}{Environment.NewLine}{responseBody}";
                     _logger?.Log(TraceLevel.Error, message);
                 }
             }
-            catch (Exception timeoutEx) when(timeoutEx is TaskCanceledException ||
+            catch (Exception timeoutEx) when (timeoutEx is TaskCanceledException ||
                 (timeoutEx is AggregateException && timeoutEx.InnerException is TaskCanceledException))
             {
                 _logger?.Log(TraceLevel.Warning, $"Publishing to Cucumber Pro timed out, consider increasing {ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT} (currently set to {_timeoutMilliseconds})");
@@ -100,29 +113,13 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             }
         }
 
-        private void DumpDebugInfo(MultipartFormDataContent content)
+        private void DumpDebugInfo(StringContent content)
         {
             if (_logger.Level < TraceLevel.Verbose)
                 return;
 
             _logger.Log(TraceLevel.Verbose, $"CPro: Sending POST to {_url}");
-            foreach (var part in content)
-            {
-                _logger.Log(TraceLevel.Verbose, $"PART: {part.Headers.ContentType}{Environment.NewLine}{part.ReadAsStringAsync().Result}");
-            }
-        }
-
-        private StringContent GetPayloadContent(List<FeatureResult> featureResults)
-        {
-            var serializerSettings = JsonFormatter.GetJsonSerializerSettings(_logger.Level >= TraceLevel.Verbose);
-            var resultsJson = JsonConvert.SerializeObject(featureResults, serializerSettings);
-            return new StringContent(resultsJson, Encoding.UTF8, CONTENT_TYPE_SPECFLOW_RESULTS_JSON);
-        }
-
-        private static StringContent GetEnvContent(IDictionary<string, string> env)
-        {
-            // CPro only supports Unix-like line endings (\n)
-            return new StringContent(string.Join("\n", env.OrderBy(e => e.Key).Select(e => $"{e.Key}={e.Value}")));
+            _logger.Log(TraceLevel.Verbose, $"PART: {content.Headers.ContentType}{Environment.NewLine}{content.ReadAsStringAsync().Result}");
         }
 
         private void SetupAuthorization(HttpClient httpClient)

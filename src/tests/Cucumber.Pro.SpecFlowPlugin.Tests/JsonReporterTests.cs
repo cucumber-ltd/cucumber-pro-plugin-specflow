@@ -11,6 +11,7 @@ using Cucumber.Pro.SpecFlowPlugin.Configuration;
 using Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings;
 using Cucumber.Pro.SpecFlowPlugin.Events;
 using Cucumber.Pro.SpecFlowPlugin.Formatters;
+using Cucumber.Pro.SpecFlowPlugin.Formatters.JsonModel;
 using Cucumber.Pro.SpecFlowPlugin.Publishing;
 using Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings;
 using Moq;
@@ -90,7 +91,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
             reporter.OnTestRunFinished(new TestRunFinishedEvent());
 
             _resultsPublisherMock.Verify(p =>
-                p.PublishResultsFromContent(It.IsAny<string>(),
+                p.PublishResultsFromContent(It.IsAny<List<FeatureResult>>(),
                 It.Is((IDictionary<string, string> env) => env.ContainsKey("GIT_BRANCH")),
                 It.IsAny<string>()));
         }
@@ -106,7 +107,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
             reporter.OnTestRunFinished(new TestRunFinishedEvent());
 
             _resultsPublisherMock.Verify(p =>
-                p.PublishResultsFromContent(It.IsAny<string>(),
+                p.PublishResultsFromContent(It.IsAny<List<FeatureResult>>(),
                 It.IsAny<IDictionary<string, string>>(),
                 "myprofile"));
         }
@@ -122,7 +123,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
             reporter.OnTestRunFinished(new TestRunFinishedEvent());
 
             _resultsPublisherMock.Verify(p =>
-                p.PublishResultsFromContent(It.IsAny<string>(),
+                p.PublishResultsFromContent(It.IsAny<List<FeatureResult>>(),
                 It.IsAny<IDictionary<string, string>>(),
                 "default"));
         }
@@ -139,7 +140,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
             reporter.OnTestRunFinished(new TestRunFinishedEvent());
 
             _resultsPublisherMock.Verify(p =>
-                p.PublishResultsFromContent(It.IsAny<string>(),
+                p.PublishResultsFromContent(It.IsAny<List<FeatureResult>>(),
                     It.IsAny<IDictionary<string, string>>(),
                     It.IsAny<string>()));
         }
@@ -156,7 +157,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
             reporter.OnTestRunFinished(new TestRunFinishedEvent());
 
             _resultsPublisherMock.Verify(p =>
-                p.PublishResultsFromContent(It.IsAny<string>(),
+                p.PublishResultsFromContent(It.IsAny<List<FeatureResult>>(),
                     It.IsAny<IDictionary<string, string>>(),
                     It.IsAny<string>()));
         }
@@ -173,7 +174,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
             reporter.OnTestRunFinished(new TestRunFinishedEvent());
 
             _resultsPublisherMock.Verify(p =>
-                p.PublishResultsFromContent(It.IsAny<string>(),
+                p.PublishResultsFromContent(It.IsAny<List<FeatureResult>>(),
                     It.IsAny<IDictionary<string, string>>(),
                     It.IsAny<string>()),
                 Times.Never);
