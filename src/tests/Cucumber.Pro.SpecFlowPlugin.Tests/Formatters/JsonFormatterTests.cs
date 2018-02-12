@@ -13,7 +13,6 @@ using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Bindings;
 using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Infrastructure;
-using TechTalk.SpecFlow.Tracing;
 using Xunit;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
@@ -97,10 +96,15 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
             testErrorProperty.SetValue(scenarioContext, error);
         }
 
+        private JsonFormatter CreateJsonFormatter()
+        {
+            return new JsonFormatter(new DebugInfoFeatureFileLocationProvider());
+        }
+
         [Fact]
         public void Collects_feature_basics()
         {
-            var formatter = new JsonFormatter(new NullListener());
+            var formatter = CreateJsonFormatter();
             var eventPublisher = new EventPublisher();
             formatter.SetEventPublisher(eventPublisher);
 
@@ -116,7 +120,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
         [Fact]
         public void Collects_scenario_basics()
         {
-            var formatter = new JsonFormatter(new NullListener());
+            var formatter = CreateJsonFormatter();
             var eventPublisher = new EventPublisher();
             formatter.SetEventPublisher(eventPublisher);
 
@@ -142,7 +146,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
         [Fact]
         public void Collects_step_basics()
         {
-            var formatter = new JsonFormatter(new NullListener());
+            var formatter = CreateJsonFormatter();
             var eventPublisher = new EventPublisher();
             formatter.SetEventPublisher(eventPublisher);
 
@@ -161,7 +165,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
         [Fact]
         public void Collects_successful_step_result()
         {
-            var formatter = new JsonFormatter(new NullListener());
+            var formatter = CreateJsonFormatter();
             var eventPublisher = new EventPublisher();
             formatter.SetEventPublisher(eventPublisher);
 
@@ -179,7 +183,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
         [Fact]
         public void Collects_failing_step_result()
         {
-            var formatter = new JsonFormatter(new NullListener());
+            var formatter = CreateJsonFormatter();
             var eventPublisher = new EventPublisher();
             formatter.SetEventPublisher(eventPublisher);
 
@@ -200,7 +204,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
         public void Supports_parallel_execution()
         {
             // situation 2 features, 3 scenarios, they run parallel
-            var formatter = new JsonFormatter(new NullListener());
+            var formatter = CreateJsonFormatter();
             var eventPublisher = new EventPublisher();
             formatter.SetEventPublisher(eventPublisher);
 

@@ -15,6 +15,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
             {
                 args.ObjectContainer.RegisterFactoryAs(ConfigFactory.Create);
                 args.ObjectContainer.RegisterTypeAs<JsonReporter, IFormatter>("cpro");
+                args.ObjectContainer.RegisterTypeAs<DebugInfoFeatureFileLocationProvider, IFeatureFileLocationProvider>();
             };
 
             runtimePluginEvents.ConfigurationDefaults += (sender, args) =>

@@ -46,7 +46,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
                 .Returns(_env);
 
             reporter.Initialize(config, new EnvFilter(config), resultsPublisherFactoryStub.Object,
-                new JsonFormatter(traceListener), environmentVariablesProviderMock.Object, new NullLogger());
+                new JsonFormatter(new DebugInfoFeatureFileLocationProvider()), environmentVariablesProviderMock.Object, new NullLogger());
         }
 
         private static Config CreateUsualConfig()

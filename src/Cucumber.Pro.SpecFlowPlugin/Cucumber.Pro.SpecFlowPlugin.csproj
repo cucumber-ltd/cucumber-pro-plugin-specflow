@@ -74,6 +74,8 @@
     <Compile Include="Events\StepFinishedEvent.cs" />
     <Compile Include="Events\TestRunFinishedEvent.cs" />
     <Compile Include="Events\TestRunStartedEvent.cs" />
+    <Compile Include="Formatters\DebugInfoFeatureFileLocationProvider.cs" />
+    <Compile Include="Formatters\IFeatureFileLocationProvider.cs" />
     <Compile Include="Formatters\JsonModel\FeatureResult.cs" />
     <Compile Include="Formatters\IFormatter.cs" />
     <Compile Include="Formatters\JsonFormatter.cs" />

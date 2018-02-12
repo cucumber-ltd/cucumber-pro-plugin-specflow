@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Cucumber.Pro.SpecFlowPlugin.Events;
@@ -10,7 +9,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using TechTalk.SpecFlow;
-using TechTalk.SpecFlow.Tracing;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 {
@@ -19,15 +17,15 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
         private const string FEATURE_RESULT_KEY = "__JsonFormatter_FatureResult";
         private const string TESTCASE_RESULT_KEY = "__JsonFormatter_TestCaseResult";
 
-        private readonly ITraceListener _traceListener;
+        private readonly IFeatureFileLocationProvider _featureFileLocationProvider;
         private readonly IDictionary<string, FeatureResult> _featureResultsById = new ConcurrentDictionary<string, FeatureResult>();
         private string _pathBaseFolder = null;
 
         internal IEnumerable<FeatureResult> FeatureResults => _featureResultsById.Values;
 
-        public JsonFormatter(ITraceListener traceListener)
+        public JsonFormatter(IFeatureFileLocationProvider featureFileLocationProvider)
         {
-            _traceListener = traceListener;
+            _featureFileLocationProvider = featureFileLocationProvider;
         }
 
         public void SetPathBaseFolder(string pathBaseFolder)
@@ -69,7 +67,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
         private void OnFeatureStarted(FeatureStartedEvent e)
         {
-            var featureFilePath = GetFeatureFileFrame()?.GetFileName();
+            var featureFilePath = _featureFileLocationProvider.GetFeatureFilePath(e.FeatureContext);
             var featureKey = GetFeatureKey(featureFilePath, e.FeatureContext);
             var featureResult = GetOrCreateFeatureResult(featureKey, () =>
             {
@@ -95,7 +93,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
             var testCaseResult = new TestCaseResult
             {
-                Line = GetFeatureFileLine(), 
+                Line = _featureFileLocationProvider.GetScenarioLine(e.ScenarioContext) ?? 0, 
                 Name = e.ScenarioContext.ScenarioInfo.Title,
                 Type = "scenario" //TODO
             };
@@ -110,28 +108,13 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             e.ScenarioContext[TESTCASE_RESULT_KEY] = testCaseResult;
         }
 
-        private static int GetFeatureFileLine()
-        {
-            var featureFileFrame = GetFeatureFileFrame();
-            var line = featureFileFrame?.GetFileLineNumber() ?? 0;
-            return line;
-        }
-
-        private static StackFrame GetFeatureFileFrame()
-        {
-            var stackTrace = new StackTrace(true);
-            var featureFileFrame = stackTrace.GetFrames()?.FirstOrDefault(
-                f => f.GetFileName()?.EndsWith(".feature") ?? false);
-            return featureFileFrame;
-        }
-
         private void OnStepFinished(StepFinishedEvent e)
         {
             var testCaseResult = (TestCaseResult)e.ScenarioContext[TESTCASE_RESULT_KEY];
 
             var stepResult = new StepResult
             {
-                Line = GetFeatureFileLine(),
+                Line = _featureFileLocationProvider.GetStepLine(e.StepContext) ?? 0,
                 Keyword = e.StepContext.StepInfo.StepInstance.Keyword,
                 Name = e.StepContext.StepInfo.Text,
                 Result = new Result
