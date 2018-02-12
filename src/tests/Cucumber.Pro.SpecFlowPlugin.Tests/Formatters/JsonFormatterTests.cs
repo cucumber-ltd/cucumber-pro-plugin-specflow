@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using BoDi;
 using Cucumber.Pro.SpecFlowPlugin.Events;
 using Cucumber.Pro.SpecFlowPlugin.Formatters;
@@ -55,8 +52,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
 
         private static void PublishScenarioFinish(EventPublisher eventPublisher, FeatureContext featureContext, ScenarioContext scenarioContext, bool testRunFinish = true)
         {
-            //eventPublisher.Send(new ScenarioFinishedEvent());
-            //eventPublisher.Send(new FeatureFinishedEvent());
+            eventPublisher.Send(new ScenarioFinishedEvent(scenarioContext, featureContext));
+            eventPublisher.Send(new FeatureFinishedEvent(featureContext));
             if (testRunFinish)
                 eventPublisher.Send(new TestRunFinishedEvent());
         }
@@ -73,14 +70,17 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
             eventPublisher.Send(new ScenarioStartedEvent(scenarioContext, featureContext));
         }
 
-        private static void PublishStep(EventPublisher eventPublisher, ScenarioStepContext stepContext, ScenarioContext scenarioContext, Exception error = null)
+        private static void PublishStep(EventPublisher eventPublisher, ScenarioStepContext stepContext, ScenarioContext scenarioContext, Exception error = null, int wait = 0)
         {
-            //eventPublisher.Send(new StepStartedEvent());
+            eventPublisher.Send(new StepStartedEvent(scenarioContext, stepContext));
 
             if (error != null)
             {
                 SetTestError(scenarioContext, error);
             }
+
+            if (wait > 0)
+                System.Threading.Thread.Sleep(wait);
 
             eventPublisher.Send(new StepFinishedEvent(scenarioContext, stepContext));
         }
@@ -159,7 +159,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
             var scenarioContext = CreateScenarioContext("Scenario1");
 
             PublishScenarioStart(eventPublisher, featureContext, scenarioContext);
-            eventPublisher.Send(new StepFinishedEvent(scenarioContext, CreateStepContext(StepDefinitionType.Given, "there is something")));
+            var stepContext = CreateStepContext(StepDefinitionType.Given, "there is something");
+            eventPublisher.Send(new StepStartedEvent(scenarioContext, stepContext));
+            eventPublisher.Send(new StepFinishedEvent(scenarioContext, stepContext));
             PublishScenarioFinish(eventPublisher, featureContext, scenarioContext);
 
             var stepResult = AssertStepResult(formatter);
@@ -183,6 +185,25 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
 
             var stepResult = AssertStepResult(formatter);
             Assert.Equal(ResultStatus.Passed, stepResult.Result?.Status);
+        }
+
+        [Fact]
+        public void Collects_successful_step_timing()
+        {
+            var formatter = CreateJsonFormatter();
+            var eventPublisher = new EventPublisher();
+            formatter.SetEventPublisher(eventPublisher);
+
+            var featureContext = CreateFeatureContext("Feature1");
+            var scenarioContext = CreateScenarioContext("Scenario1");
+
+            PublishScenarioStart(eventPublisher, featureContext, scenarioContext);
+            PublishStep(eventPublisher, CreateStepContext(StepDefinitionType.Given, "there is something"), scenarioContext,
+                wait: 10);
+            PublishScenarioFinish(eventPublisher, featureContext, scenarioContext);
+
+            var stepResult = AssertStepResult(formatter);
+            Assert.True(stepResult.Result?.Duration > 5);
         }
 
         [Fact]

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -19,6 +20,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
     {
         private const string FEATURE_RESULT_KEY = "__JsonFormatter_FatureResult";
         private const string TESTCASE_RESULT_KEY = "__JsonFormatter_TestCaseResult";
+        private const string STEP_STARTTIME_KEY = "__JsonFormatter_Step_StartTime";
+        private const string SCENARIO_STOPWATCH_KEY = "__JsonFormatter_Scenario_Stopwatch";
 
         private readonly IFeatureFileLocationProvider _featureFileLocationProvider;
         private readonly IDictionary<string, FeatureResult> _featureResultsById = new ConcurrentDictionary<string, FeatureResult>();
@@ -42,6 +45,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
         {
             publisher.RegisterHandlerFor(new RuntimeEventHandler<FeatureStartedEvent>(OnFeatureStarted));
             publisher.RegisterHandlerFor(new RuntimeEventHandler<ScenarioStartedEvent>(OnScenarioStarted));
+            publisher.RegisterHandlerFor(new RuntimeEventHandler<StepStartedEvent>(OnStepStarted));
             publisher.RegisterHandlerFor(new RuntimeEventHandler<StepFinishedEvent>(OnStepFinished));
             publisher.RegisterHandlerFor(new RuntimeEventHandler<ScenarioFinishedEvent>(OnScenarioFinished));
         }
@@ -110,6 +114,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
             // the ScenarioContext is exclusively used by the test thread
             e.ScenarioContext[TESTCASE_RESULT_KEY] = testCaseResult;
+            var stopwatch = new Stopwatch();
+            e.ScenarioContext[SCENARIO_STOPWATCH_KEY] = stopwatch;
+            stopwatch.Start();
         }
 
         private ResultStatus GetResultStatus(ScenarioContext scenarioContext)
@@ -135,15 +142,26 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             }
         }
 
+        private void OnStepStarted(StepStartedEvent e)
+        {
+            var stopwatch = (Stopwatch) e.ScenarioContext[SCENARIO_STOPWATCH_KEY];
+            long startTime = stopwatch.ElapsedMilliseconds;
+            e.ScenarioContext[STEP_STARTTIME_KEY] = startTime;
+        }
+
         private void OnStepFinished(StepFinishedEvent e)
         {
             var testCaseResult = (TestCaseResult)e.ScenarioContext[TESTCASE_RESULT_KEY];
             var stepLine = _featureFileLocationProvider.GetStepLine(e.StepContext.StepInfo.StepInstance);
 
-            RegisterStepResult(testCaseResult, e.StepContext.StepInfo.StepInstance, e.ScenarioContext, stepLine);
+            var stopwatch = (Stopwatch)e.ScenarioContext[SCENARIO_STOPWATCH_KEY];
+            long startTime = (long)e.ScenarioContext[STEP_STARTTIME_KEY];
+            long duration = stopwatch.ElapsedMilliseconds - startTime;
+
+            RegisterStepResult(testCaseResult, e.StepContext.StepInfo.StepInstance, e.ScenarioContext, stepLine, duration);
         }
 
-        private void RegisterStepResult(TestCaseResult testCaseResult, StepInstance stepInstance, ScenarioContext scenarioContext, int? stepLine)
+        private void RegisterStepResult(TestCaseResult testCaseResult, StepInstance stepInstance, ScenarioContext scenarioContext, int? stepLine, long duration = 0)
         {
             var stepResult = new StepResult
             {
@@ -152,7 +170,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
                 Name = stepInstance.Text,
                 Result = new Result
                 {
-                    Duration = 0, //TODO
+                    Duration = duration,
                     Status = GetResultStatus(scenarioContext),
                     ErrorMessage = scenarioContext.TestError?.ToString()
                 }
@@ -163,6 +181,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
         private void OnScenarioFinished(ScenarioFinishedEvent e)
         {
             var testCaseResult = (TestCaseResult)e.ScenarioContext[TESTCASE_RESULT_KEY];
+            var stopwatch = (Stopwatch)e.ScenarioContext[SCENARIO_STOPWATCH_KEY];
+            stopwatch.Stop();
 
             var status = GetResultStatus(e.ScenarioContext);
             if (status == ResultStatus.Undefined)
@@ -181,7 +201,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
             testCaseResult.Result = new Result
             {
-                Duration = 0, //TODO
+                Duration = stopwatch.ElapsedMilliseconds,
                 Status = status,
                 ErrorMessage = e.ScenarioContext.TestError?.ToString()
             };

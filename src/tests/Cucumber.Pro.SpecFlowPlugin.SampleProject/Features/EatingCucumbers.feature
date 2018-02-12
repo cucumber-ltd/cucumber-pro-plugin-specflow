@@ -34,3 +34,11 @@ Scenario: Skipped cucumbers
     Given I have already eaten 5 cucumbers
     When there is an error
     Then the last step is skipped
+
+@beforescenario_error
+Scenario: Scenario with a BeforeScenario error
+    Given I have already eaten 5 cucumbers
+
+@afterscenario_error
+Scenario: Scenario with a AfterScenario error
+    Given I have already eaten 5 cucumbers

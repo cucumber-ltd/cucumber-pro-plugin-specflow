@@ -49,6 +49,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.SampleProject.StepDefinitions
         }
 
         [When(@"there is an error")]
+        [BeforeScenario("beforescenario_error")]
+        [AfterScenario("afterscenario_error")]
         public void WhenThereIsAnError()
         {
             throw new Exception("simulated error");

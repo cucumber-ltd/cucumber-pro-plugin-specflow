@@ -66,6 +66,7 @@
     <Compile Include="EnvironmentSettings\IEnvironmentVariablesProvider.cs" />
     <Compile Include="Events\EventPublisherHooks.cs" />
     <Compile Include="Events\EventPublisher.cs" />
+    <Compile Include="Events\FeatureFinishedEvent.cs" />
     <Compile Include="Events\FeatureStartedEvent.cs" />
     <Compile Include="Events\IEventPublisher.cs" />
     <Compile Include="Events\RuntimeEvent.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Events\ScenarioFinishedEvent.cs" />
     <Compile Include="Events\ScenarioStartedEvent.cs" />
     <Compile Include="Events\StepFinishedEvent.cs" />
+    <Compile Include="Events\StepStartedEvent.cs" />
     <Compile Include="Events\TestRunFinishedEvent.cs" />
     <Compile Include="Events\TestRunStartedEvent.cs" />
     <Compile Include="Formatters\DebugInfoFeatureFileLocationProvider.cs" />

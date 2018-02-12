@@ -181,6 +181,38 @@ this.ScenarioSetup(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.FactAttribute(DisplayName="Scenario with a BeforeScenario error")]
+        [Xunit.TraitAttribute("FeatureTitle", "Eating cucumbers")]
+        [Xunit.TraitAttribute("Description", "Scenario with a BeforeScenario error")]
+        [Xunit.TraitAttribute("Category", "beforescenario_error")]
+        public virtual void ScenarioWithABeforeScenarioError()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Scenario with a BeforeScenario error", new string[] {
+                        "beforescenario_error"});
+#line 39
+this.ScenarioSetup(scenarioInfo);
+#line 40
+    testRunner.Given("I have already eaten 5 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Scenario with a AfterScenario error")]
+        [Xunit.TraitAttribute("FeatureTitle", "Eating cucumbers")]
+        [Xunit.TraitAttribute("Description", "Scenario with a AfterScenario error")]
+        [Xunit.TraitAttribute("Category", "afterscenario_error")]
+        public virtual void ScenarioWithAAfterScenarioError()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Scenario with a AfterScenario error", new string[] {
+                        "afterscenario_error"});
+#line 43
+this.ScenarioSetup(scenarioInfo);
+#line 44
+    testRunner.Given("I have already eaten 5 cucumbers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "2.2.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

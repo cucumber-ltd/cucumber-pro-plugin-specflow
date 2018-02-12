@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cucumber.Pro.SpecFlowPlugin.Formatters;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Infrastructure;
@@ -17,7 +18,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Events
             _contextManager = contextManager;
         }
 
-        [BeforeTestRun]
+        [BeforeTestRun(Order = Int32.MinValue)]
         public static void SetupPlugin(IDictionary<string, IFormatter> formatters, EventPublisher eventPublisher)
         {
             foreach (var formatter in formatters.Values)
@@ -26,31 +27,43 @@ namespace Cucumber.Pro.SpecFlowPlugin.Events
             eventPublisher.Send(new TestRunStartedEvent());
         }
 
-        [BeforeFeature]
+        [BeforeFeature(Order = Int32.MinValue)]
         public static void BeforeFeature(EventPublisher eventPublisher, FeatureContext featureContext)
         {
             eventPublisher.Send(new FeatureStartedEvent(featureContext));
         }
 
-        [BeforeScenario]
+        [BeforeScenario(Order = Int32.MinValue)]
         public void BeforeScenario()
         {
             _eventPublisher.Send(new ScenarioStartedEvent(_contextManager.ScenarioContext, _contextManager.FeatureContext));
         }
 
-        [AfterScenario]
-        public void AfterScenario()
+        [Before(Order = Int32.MinValue)]
+        public void BeforeStep()
         {
-            _eventPublisher.Send(new ScenarioFinishedEvent(_contextManager.ScenarioContext, _contextManager.FeatureContext));
+            _eventPublisher.Send(new StepStartedEvent(_contextManager.ScenarioContext));
         }
 
-        [AfterStep]
+        [AfterStep(Order = Int32.MaxValue)]
         public void AfterStep()
         {
             _eventPublisher.Send(new StepFinishedEvent(_contextManager.ScenarioContext));
         }
 
-        [AfterTestRun]
+        [AfterScenario(Order = Int32.MaxValue)]
+        public void AfterScenario()
+        {
+            _eventPublisher.Send(new ScenarioFinishedEvent(_contextManager.ScenarioContext, _contextManager.FeatureContext));
+        }
+
+        [AfterFeature(Order = Int32.MaxValue)]
+        public static void AfterFeature(EventPublisher eventPublisher, FeatureContext featureContext)
+        {
+            eventPublisher.Send(new FeatureFinishedEvent(featureContext));
+        }
+
+        [AfterTestRun(Order = Int32.MaxValue)]
         public static void AfterTestRun(EventPublisher eventPublisher, JsonFormatter jsonFormatter)
         {
             eventPublisher.Send(new TestRunFinishedEvent());

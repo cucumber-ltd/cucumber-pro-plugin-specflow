@@ -16,11 +16,11 @@
     [x] Demo project
     [x] Verbose logging
     [ ] Demo
-    [ ] Support scenario outlines
+    [x] Support scenario outlines
     [x] Support undefined/skipped/pending(?) result
-    [ ] Support background(?)
-    [ ] Support hooks (errors in hooks)
-    [ ] Support step timings
+    [x] Support background(?)
+    [x] Support hooks (errors in hooks)
+    [x] Support step timings
     [x] Support parallel run
     [x] Convert feature file paths to relative
     [ ] readme.txt of the NuGet package
@@ -41,7 +41,10 @@
 - How to release, how to release prelim versions?
 - Max length for error message, entire json?
 - Including skipped scenario steps (after a failing step): Is this necessary - we don't have them by default.
+- Background steps are reported as normal steps, but with a line number pointing to the background step. Ok?
 
 # Known Issues
 
 - No line number for undefined steps
+- Line number for Scenario Outline examples is pointing to the SO header line, type="scenario"
+- Hook errors are not captured
