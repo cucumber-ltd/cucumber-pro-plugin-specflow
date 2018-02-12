@@ -81,6 +81,7 @@
     <Compile Include="Formatters\JsonModel\ResultStatus.cs" />
     <Compile Include="Formatters\JsonModel\StepResult.cs" />
     <Compile Include="Formatters\JsonModel\TestCaseResult.cs" />
+    <Compile Include="Formatters\PathHelper.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="JsonReporter.cs" />
     <Compile Include="Logger.cs" />

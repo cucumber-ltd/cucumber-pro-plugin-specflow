@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -15,12 +16,14 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 {
     public class JsonFormatter : IFormatter
     {
+        private const string FEATURE_RESULT_KEY = "__JsonFormatter_FatureResult";
+        private const string TESTCASE_RESULT_KEY = "__JsonFormatter_TestCaseResult";
+
         private readonly ITraceListener _traceListener;
-        private readonly List<FeatureResult> _featureResults = new List<FeatureResult>();
-        private FeatureResult _currentFeatureResult = null;
+        private readonly IDictionary<string, FeatureResult> _featureResultsById = new ConcurrentDictionary<string, FeatureResult>();
         private string _pathBaseFolder = null;
 
-        internal IEnumerable<FeatureResult> FeatureResults => _featureResults;
+        internal IEnumerable<FeatureResult> FeatureResults => _featureResultsById.Values;
 
         public JsonFormatter(ITraceListener traceListener)
         {
@@ -29,7 +32,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
         public void SetPathBaseFolder(string pathBaseFolder)
         {
-            if (_featureResults.Any())
+            if (FeatureResults.Any())
                 throw new InvalidOperationException("The path base folder cannot be changed once there are features reported.");
             _pathBaseFolder = pathBaseFolder;
         }
@@ -41,31 +44,54 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             publisher.RegisterHandlerFor(new RuntimeEventHandler<StepFinishedEvent>(OnStepFinished));
         }
 
+        private string GetFeatureKey(string featureFilePath, FeatureContext featureContext)
+        {
+            return featureFilePath ?? featureContext.FeatureInfo.Title;
+        }
+
+        private FeatureResult GetOrCreateFeatureResult(string key, Func<FeatureResult> createFeatureResult)
+        {
+            if (!_featureResultsById.TryGetValue(key, out var featureResult))
+            {
+                var newFeatureResult = createFeatureResult();
+
+                lock (_featureResultsById)
+                {
+                    if (!_featureResultsById.TryGetValue(key, out featureResult))
+                    {
+                        _featureResultsById[key] = newFeatureResult;
+                        featureResult = newFeatureResult;
+                    }
+                }
+            }
+            return featureResult;
+        }
+
         private void OnFeatureStarted(FeatureStartedEvent e)
         {
-            _currentFeatureResult = null; // this triggers feature initialization in OnScenarioStarted
+            var featureFilePath = GetFeatureFileFrame()?.GetFileName();
+            var featureKey = GetFeatureKey(featureFilePath, e.FeatureContext);
+            var featureResult = GetOrCreateFeatureResult(featureKey, () =>
+            {
+                if (featureFilePath != null && Path.IsPathRooted(featureFilePath) && _pathBaseFolder != null)
+                {
+                    featureFilePath = PathHelper.MakeRelativePath(_pathBaseFolder, featureFilePath);
+                }
+
+                return new FeatureResult
+                {
+                    Uri = featureFilePath?.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                    Name = e.FeatureContext.FeatureInfo.Title
+                };
+            });
+
+            // the FeatureContext is exclusively used by the test thread
+            e.FeatureContext[FEATURE_RESULT_KEY] = featureResult;
         }
 
         private void OnScenarioStarted(ScenarioStartedEvent e)
         {
-            if (_currentFeatureResult == null)
-            {
-                var featureFileFrame = GetFeatureFileFrame();
-                var featureFile = featureFileFrame?.GetFileName() ?? "Unknown.feature";
-
-                if (Path.IsPathRooted(featureFile) && _pathBaseFolder != null)
-                {
-                    featureFile = MakeRelativePath(_pathBaseFolder, featureFile);
-                }
-
-                _currentFeatureResult = new FeatureResult
-                {
-                    Uri = featureFile.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
-                    Name = e.FeatureContext.FeatureInfo.Title
-                };
-
-                _featureResults.Add(_currentFeatureResult);
-            }
+            var featureResult = (FeatureResult)e.FeatureContext[FEATURE_RESULT_KEY];
 
             var testCaseResult = new TestCaseResult
             {
@@ -73,40 +99,15 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
                 Name = e.ScenarioContext.ScenarioInfo.Title,
                 Type = "scenario" //TODO
             };
-            _currentFeatureResult.TestCaseResults.Add(testCaseResult);
-        }
 
-        /// <summary>
-        /// Creates a relative path from one file or folder to another.
-        /// </summary>
-        /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
-        /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>
-        /// <returns>The relative path from the start directory to the end path or <c>toPath</c> if the paths are not related.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="UriFormatException"></exception>
-        /// <exception cref="InvalidOperationException"></exception>
-        public static String MakeRelativePath(String fromPath, String toPath)
-        {
-            if (String.IsNullOrEmpty(fromPath)) throw new ArgumentNullException("fromPath");
-            if (String.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
-
-            if (!fromPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                fromPath += Path.DirectorySeparatorChar;
-
-            Uri fromUri = new Uri(fromPath);
-            Uri toUri = new Uri(toPath);
-
-            if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
-
-            Uri relativeUri = fromUri.MakeRelativeUri(toUri);
-            String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-
-            if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
+            // we need to protect the addition, because multiple test threads might run scenarios for the same feature file
+            lock (featureResult)
             {
-                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                featureResult.TestCaseResults.Add(testCaseResult);
             }
 
-            return relativePath;
+            // the ScenarioContext is exclusively used by the test thread
+            e.ScenarioContext[TESTCASE_RESULT_KEY] = testCaseResult;
         }
 
         private static int GetFeatureFileLine()
@@ -126,8 +127,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
         private void OnStepFinished(StepFinishedEvent e)
         {
-            var featureResult = _featureResults.Last();
-            var testCaseResult = featureResult.TestCaseResults.Last();
+            var testCaseResult = (TestCaseResult)e.ScenarioContext[TESTCASE_RESULT_KEY];
 
             var stepResult = new StepResult
             {
@@ -153,7 +153,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
             serializerSettings.Formatting = Formatting.Indented;
             serializerSettings.NullValueHandling = NullValueHandling.Ignore;
 
-            return JsonConvert.SerializeObject(_featureResults, serializerSettings);
+            return JsonConvert.SerializeObject(FeatureResults, serializerSettings);
         }
     }
 }

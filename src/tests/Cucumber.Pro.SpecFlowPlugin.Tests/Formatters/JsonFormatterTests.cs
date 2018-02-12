@@ -20,6 +20,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
 {
     public class JsonFormatterTests
     {
+        private bool _testRunStarted = false;
+
         private FeatureContext CreateFeatureContext(string name)
         {
             var container = new ObjectContainer();
@@ -45,23 +47,28 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
             return container.Resolve<ScenarioStepContext>();
         }
 
-        private static void PublishScenarioExecution(EventPublisher eventPublisher, FeatureContext featureContext, ScenarioContext scenarioContext)
+        private void PublishScenarioExecution(EventPublisher eventPublisher, FeatureContext featureContext, ScenarioContext scenarioContext)
         {
             PublishScenarioStart(eventPublisher, featureContext, scenarioContext);
-            PublishScenarioFinish(eventPublisher);
+            PublishScenarioFinish(eventPublisher, featureContext, scenarioContext);
         }
 
-        private static void PublishScenarioFinish(EventPublisher eventPublisher)
+        private static void PublishScenarioFinish(EventPublisher eventPublisher, FeatureContext featureContext, ScenarioContext scenarioContext, bool testRunFinish = true)
         {
             //eventPublisher.Send(new ScenarioFinishedEvent());
             //eventPublisher.Send(new FeatureFinishedEvent());
-            eventPublisher.Send(new TestRunFinishedEvent());
+            if (testRunFinish)
+                eventPublisher.Send(new TestRunFinishedEvent());
         }
 
-        private static void PublishScenarioStart(EventPublisher eventPublisher, FeatureContext featureContext,
+        private void PublishScenarioStart(EventPublisher eventPublisher, FeatureContext featureContext,
             ScenarioContext scenarioContext)
         {
-            eventPublisher.Send(new TestRunStartedEvent());
+            if (!_testRunStarted)
+            {
+                eventPublisher.Send(new TestRunStartedEvent());
+                _testRunStarted = true;
+            }
             eventPublisher.Send(new FeatureStartedEvent(featureContext));
             eventPublisher.Send(new ScenarioStartedEvent(scenarioContext, featureContext));
         }
@@ -76,6 +83,11 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
             }
 
             eventPublisher.Send(new StepFinishedEvent(scenarioContext, stepContext));
+        }
+
+        private void PublishSampleStep(EventPublisher eventPublisher, ScenarioContext scenarioContext, StepDefinitionType type = StepDefinitionType.Given)
+        {
+            PublishStep(eventPublisher, CreateStepContext(type, "there is something"), scenarioContext);
         }
 
         private static void SetTestError(ScenarioContext scenarioContext, Exception error)
@@ -139,7 +151,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
 
             PublishScenarioStart(eventPublisher, featureContext, scenarioContext);
             eventPublisher.Send(new StepFinishedEvent(scenarioContext, CreateStepContext(StepDefinitionType.Given, "there is something")));
-            PublishScenarioFinish(eventPublisher);
+            PublishScenarioFinish(eventPublisher, featureContext, scenarioContext);
 
             var stepResult = AssertStepResult(formatter);
             Assert.Equal("there is something", stepResult.Name);
@@ -157,8 +169,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
             var scenarioContext = CreateScenarioContext("Scenario1");
 
             PublishScenarioStart(eventPublisher, featureContext, scenarioContext);
-            PublishStep(eventPublisher, CreateStepContext(StepDefinitionType.Given, "there is something"), scenarioContext);
-            PublishScenarioFinish(eventPublisher);
+            PublishSampleStep(eventPublisher, scenarioContext);
+            PublishScenarioFinish(eventPublisher, featureContext, scenarioContext);
 
             var stepResult = AssertStepResult(formatter);
             Assert.Equal(ResultStatus.Passed, stepResult.Result?.Status);
@@ -177,11 +189,49 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Formatters
             PublishScenarioStart(eventPublisher, featureContext, scenarioContext);
             var error = new Exception("simulated error");
             PublishStep(eventPublisher, CreateStepContext(StepDefinitionType.Given, "there is something"), scenarioContext, error);
-            PublishScenarioFinish(eventPublisher);
+            PublishScenarioFinish(eventPublisher, featureContext, scenarioContext);
 
             var stepResult = AssertStepResult(formatter);
             Assert.Equal(ResultStatus.Failed, stepResult.Result?.Status);
             Assert.StartsWith(error.ToString().Substring(0, 20), stepResult.Result?.ErrorMessage);
+        }
+
+        [Fact]
+        public void Supports_parallel_execution()
+        {
+            // situation 2 features, 3 scenarios, they run parallel
+            var formatter = new JsonFormatter(new NullListener());
+            var eventPublisher = new EventPublisher();
+            formatter.SetEventPublisher(eventPublisher);
+
+            var feature1Context = CreateFeatureContext("Feature1");
+            var feature2Context = CreateFeatureContext("Feature2");
+            var scenario1Context = CreateScenarioContext("Scenario1");
+            var scenario2Context = CreateScenarioContext("Scenario2");
+            var scenario3Context = CreateScenarioContext("Scenario3");
+
+            PublishScenarioStart(eventPublisher, feature1Context, scenario1Context);
+            PublishScenarioStart(eventPublisher, feature1Context, scenario2Context);
+            PublishScenarioStart(eventPublisher, feature2Context, scenario3Context);
+
+            PublishSampleStep(eventPublisher, scenario3Context, StepDefinitionType.Then);
+            PublishSampleStep(eventPublisher, scenario1Context, StepDefinitionType.Given);
+            PublishSampleStep(eventPublisher, scenario2Context, StepDefinitionType.When);
+
+            PublishScenarioFinish(eventPublisher, feature1Context, scenario2Context, false);
+            PublishScenarioFinish(eventPublisher, feature2Context, scenario3Context, false);
+            PublishScenarioFinish(eventPublisher, feature1Context, scenario1Context, true);
+
+            var feature1Result = Assert.Single(formatter.FeatureResults.Where(fr => fr.Name == "Feature1"));
+            var feature2Result = Assert.Single(formatter.FeatureResults.Where(fr => fr.Name == "Feature2"));
+
+            var scenario1Result = Assert.Single(feature1Result.TestCaseResults.Where(tcr => tcr.Name == "Scenario1"));
+            var scenario2Result = Assert.Single(feature1Result.TestCaseResults.Where(tcr => tcr.Name == "Scenario2"));
+            var scenario3Result = Assert.Single(feature2Result.TestCaseResults.Where(tcr => tcr.Name == "Scenario3"));
+
+            Assert.Single(scenario1Result.StepResults.Where(sr => sr.Keyword == "Given "));
+            Assert.Single(scenario2Result.StepResults.Where(sr => sr.Keyword == "When "));
+            Assert.Single(scenario3Result.StepResults.Where(sr => sr.Keyword == "Then "));
         }
     }
 }
