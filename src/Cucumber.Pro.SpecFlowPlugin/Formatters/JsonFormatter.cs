@@ -75,6 +75,28 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
         private void OnFeatureStarted(FeatureStartedEvent e)
         {
+            //var featureFilePath = _featureFileLocationProvider.GetFeatureFilePath(e.FeatureContext);
+            //var featureKey = GetFeatureKey(featureFilePath, e.FeatureContext);
+            //var featureResult = GetOrCreateFeatureResult(featureKey, () =>
+            //{
+            //    if (featureFilePath != null && Path.IsPathRooted(featureFilePath) && _pathBaseFolder != null)
+            //    {
+            //        featureFilePath = PathHelper.MakeRelativePath(_pathBaseFolder, featureFilePath);
+            //    }
+
+            //    return new FeatureResult
+            //    {
+            //        Uri = featureFilePath?.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+            //        Name = e.FeatureContext.FeatureInfo.Title
+            //    };
+            //});
+
+            //// the FeatureContext is exclusively used by the test thread
+            //e.FeatureContext[FEATURE_RESULT_KEY] = featureResult;
+        }
+
+        private void OnFeatureStartedX(FeatureStartedEvent e)
+        {
             var featureFilePath = _featureFileLocationProvider.GetFeatureFilePath(e.FeatureContext);
             var featureKey = GetFeatureKey(featureFilePath, e.FeatureContext);
             var featureResult = GetOrCreateFeatureResult(featureKey, () =>
@@ -97,6 +119,10 @@ namespace Cucumber.Pro.SpecFlowPlugin.Formatters
 
         private void OnScenarioStarted(ScenarioStartedEvent e)
         {
+            if (!e.FeatureContext.ContainsKey(FEATURE_RESULT_KEY))
+            {
+                OnFeatureStartedX(new FeatureStartedEvent(e.FeatureContext));
+            }
             var featureResult = (FeatureResult)e.FeatureContext[FEATURE_RESULT_KEY];
 
             var testCaseResult = new TestCaseResult
