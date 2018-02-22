@@ -7,11 +7,10 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
     {
         public static string BuildCucumberProUrl(Config config)
         {
-            return BuildCucumberProUrl(config, config.GetString(ConfigKeys.CUCUMBERPRO_PROJECTNAME),
-                config.GetString(ConfigKeys.CUCUMBERPRO_REVISION));
+            return BuildCucumberProUrl(config, config.GetString(ConfigKeys.CUCUMBERPRO_PROJECTNAME));
         }
 
-        public static string BuildCucumberProUrl(Config config, string projectName, string revision)
+        public static string BuildCucumberProUrl(Config config, string projectName)
         {
             var cucumberProUrl = GetCucumberProUrl(config);
             return $"{cucumberProUrl}tests/results/{projectName}";

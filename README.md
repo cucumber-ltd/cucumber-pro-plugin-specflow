@@ -26,7 +26,7 @@
     [x] Build NuGet from CI
     [ ] readme.txt of the NuGet package
     [ ] icon, texts, etc of NuGet package
-    [*] Use single json generator
+    [x] Use single json generator
     [ ] TFS Build Line++ issue
     [ ] Send revision as ENV
     [ ] Replace Cucumber.Java with SpecFlow content type

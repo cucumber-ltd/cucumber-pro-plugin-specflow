@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Cucumber.Pro.SpecFlowPlugin.Configuration;
@@ -14,17 +13,14 @@ using Xunit.Abstractions;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
 {
-    public class HttpMultipartResultsPublisherTests
+    public class HttpSingleJsonResultsPublisherTests
     {
         public class CProStubNancyModule : NancyModule
         {
             public static bool IsInvoked;
             public static string ProjectName;
-            public static string Revision;
-            public static string ProfileName;
             public static string Json;
             public static string Auth;
-            public static Dictionary<string, string> Env;
             public static int ExpectedResponseCode = 200;
             public static int WaitMilliseconds = 0;
 
@@ -34,18 +30,15 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             {
                 IsInvoked = false;
                 ProjectName = null;
-                Revision = null;
-                ProfileName = null;
                 Json = null;
                 Auth = null;
-                Env = null;
                 ExpectedResponseCode = expectedResponseCode;
                 WaitMilliseconds = waitMilliseconds;
             }
 
             public CProStubNancyModule()
             {
-                Post["{projectName}/{revision}"] = parameters =>
+                Post["{projectName}"] = parameters =>
                 {
                     IsInvoked = true;
 
@@ -55,15 +48,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
                     Auth = Request.Headers.Authorization;
 
                     ProjectName = parameters.projectName;
-                    Revision = parameters.revision;
 
-                    ProfileName = Request.Form["profileName"];
-
-                    var envStream = Request.Files.First(f => f.Key.Contains("env")).Value;
-                    var envContent = new StreamReader(envStream).ReadToEnd();
-                    Env = envContent.Split('\n').Where(l => !string.IsNullOrWhiteSpace(l)).ToDictionary(l => l.Split(new[] { '=' }, 2).First(), l => l.Split(new[] { '=' }, 2).Last());
-
-                    var jsonStream = Request.Files.First(f => f.Key.Contains("payload")).Value;
+                    var jsonStream = Request.Body;
                     Json = new StreamReader(jsonStream).ReadToEnd();
 
                     return ExpectedResponseCode;
@@ -71,25 +57,23 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             }
         }
 
-        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
-
         const string SampleJson = @"[{""name"":""Eating_cucumbers"",""elements"":[]}]"; // no whitespaces!
         static readonly Dictionary<string, string> SampleEnv = new Dictionary<string, string> { { "env1", "value1" }, { "env2", "value2" } };
         const string SampleProfileName = "my-profile";
         const string SampleToken = "my-token";
         private const string SampleProjectName = "prj";
+        private const string SampleBranch = "master";
         private const string SampleRevision = "rev1";
         private readonly StubTraceListener stubTraceListener;
 
-        public HttpMultipartResultsPublisherTests(ITestOutputHelper testOutputHelper)
+        public HttpSingleJsonResultsPublisherTests(ITestOutputHelper testOutputHelper)
         {
-            _testOutputHelper = testOutputHelper;
-            stubTraceListener = new StubTraceListener(_testOutputHelper);
+            stubTraceListener = new StubTraceListener(testOutputHelper);
         }
 
-        const string SampleUrl = "http://localhost:8082/tests/results/" + SampleProjectName + "/" + SampleRevision;
+        const string SampleUrl = "http://localhost:8082/tests/results/" + SampleProjectName;
 
-        private void PublishResultsToStub(Func<HttpMultipartResultsPublisher> publisherFactory = null, int timeout = 5000, bool checkInvoked = true)
+        private void PublishResultsToStub(Func<HttpSingleJsonResultsPublisher> publisherFactory = null, int timeout = 5000, bool checkInvoked = true)
         {
             var hostConfiguration = new HostConfiguration {RewriteLocalhost = false};
             using (var nancyHost = new NancyHost(new Uri("http://localhost:8082/tests/results/"),
@@ -98,7 +82,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
                 nancyHost.Start();
 
                 var publisher = publisherFactory != null ? publisherFactory() :
-                    new HttpMultipartResultsPublisher(stubTraceListener.Logger, url: SampleUrl, token: SampleToken, timeoutMilliseconds: timeout);
+                    new HttpSingleJsonResultsPublisher(stubTraceListener.Logger, url: SampleUrl, token: SampleToken, timeoutMilliseconds: timeout, revision: SampleRevision, branch: SampleBranch, tag: null);
                 publisher.PublishResultsFromContent(SampleJson, SampleEnv, SampleProfileName);
             }
 
@@ -107,15 +91,62 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
         }
 
         [Fact]
-        public void Posts_results_as_multipart_formadata()
+        public void Posts_feature_results_as_part_of_the_json()
         {
             CProStubNancyModule.Reset();
             PublishResultsToStub();
             Assert.Equal(SampleProjectName, CProStubNancyModule.ProjectName);
-            Assert.Equal(SampleRevision, CProStubNancyModule.Revision);
-            Assert.Equal(SampleProfileName, CProStubNancyModule.ProfileName);
-            Assert.Equal(SampleEnv, CProStubNancyModule.Env);
-            Assert.Equal(SampleJson, CProStubNancyModule.NormalizedJson);
+            AssertFeatureResultsInJson();
+        }
+
+        private static void AssertFeatureResultsInJson()
+        {
+            Assert.Contains(SampleJson, CProStubNancyModule.NormalizedJson);
+        }
+
+        [Fact]
+        public void Posts_ENV_as_part_of_the_json()
+        {
+            CProStubNancyModule.Reset();
+            PublishResultsToStub();
+            Assert.Equal(SampleProjectName, CProStubNancyModule.ProjectName);
+            AssertSampleEnvInJson();
+        }
+
+        private static void AssertSampleEnvInJson()
+        {
+            foreach (var env in SampleEnv)
+            {
+                Assert.Contains($"\"{env.Key}\":\"{env.Value}\"", CProStubNancyModule.NormalizedJson);
+            }
+        }
+
+        [Fact]
+        public void Posts_Revision_as_part_of_the_json()
+        {
+            CProStubNancyModule.Reset();
+            PublishResultsToStub();
+            Assert.Equal(SampleProjectName, CProStubNancyModule.ProjectName);
+            AssertRevisionInJson();
+        }
+
+        private static void AssertRevisionInJson()
+        {
+            Assert.Contains(SampleRevision, CProStubNancyModule.NormalizedJson);
+        }
+
+        [Fact]
+        public void Posts_ProfileName_as_part_of_the_json()
+        {
+            CProStubNancyModule.Reset();
+            PublishResultsToStub();
+            Assert.Equal(SampleProjectName, CProStubNancyModule.ProjectName);
+            AssertProfileNameInJson();
+        }
+
+        private static void AssertProfileNameInJson()
+        {
+            Assert.Contains(SampleProfileName, CProStubNancyModule.NormalizedJson);
         }
 
         [Fact]
@@ -184,12 +215,12 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             config.Set(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT, 5000);
 
             CProStubNancyModule.Reset();
-            PublishResultsToStub(() => new HttpMultipartResultsPublisher(config, stubTraceListener.Logger));
+            PublishResultsToStub(() => new HttpSingleJsonResultsPublisher(config, stubTraceListener.Logger));
             Assert.Equal(SampleProjectName, CProStubNancyModule.ProjectName);
-            Assert.Equal(SampleRevision, CProStubNancyModule.Revision);
-            Assert.Equal(SampleProfileName, CProStubNancyModule.ProfileName);
-            Assert.Equal(SampleEnv, CProStubNancyModule.Env);
-            Assert.Equal(SampleJson, CProStubNancyModule.NormalizedJson);
+            AssertProfileNameInJson();
+            AssertSampleEnvInJson();
+            AssertFeatureResultsInJson();
+            AssertRevisionInJson();
         }
     }
 }

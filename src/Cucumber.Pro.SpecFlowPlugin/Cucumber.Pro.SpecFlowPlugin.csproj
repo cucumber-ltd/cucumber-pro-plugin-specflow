@@ -92,7 +92,6 @@
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Publishing\CucumberProResultsUrlBuilder.cs" />
-    <Compile Include="Publishing\HttpMultipartResultsPublisher.cs" />
     <Compile Include="Publishing\HttpSingleJsonResultsPublisher.cs" />
     <Compile Include="Publishing\IResultsPublisher.cs" />
     <Compile Include="Publishing\IResultsPublisherFactory.cs" />
