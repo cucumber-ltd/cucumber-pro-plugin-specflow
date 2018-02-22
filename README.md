@@ -1,6 +1,6 @@
 # cucumber-pro-plugin-specflow
 
-[![Build status](https://gasparnagy.visualstudio.com/_apis/public/build/definitions/dc4f6ce1-e00f-4c7d-98fd-9397bf9a4281/43/badge)](https://gasparnagy.visualstudio.com/cucumber-pro-specflow-plugin/_build/index?context=allDefinitions&path=%5C&definitionId=43&_a=completed)
+[![Build status](https://cucumberbdd.visualstudio.com/_apis/public/build/definitions/3f6ffcb6-fe64-4a4f-85bd-eed3893f83fd/1/badge)](https://cucumberbdd.visualstudio.com/cucumber-pro-plugin-specflow/_build/index?context=mine&path=%5C&definitionId=1&_a=completed)
 
 # TODO
 
@@ -40,6 +40,7 @@
     [x] Remove explicit opt-in for local publishing
     [x] Add basic documentation
     [x] Remove smoke test token from code - move it to CI config
+    [x] Configure CI on cucumberbdd.visualstudio.com
     [ ] icon, texts, etc of NuGet package
     [ ] TFS Build Line++ issue
     [ ] Replace Cucumber.Java with SpecFlow content type
