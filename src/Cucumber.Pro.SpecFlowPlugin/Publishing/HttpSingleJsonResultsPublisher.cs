@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Cucumber.Pro.SpecFlowPlugin.Configuration;
@@ -24,6 +26,21 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
         private readonly string _revision;
         private readonly string _branch;
         private readonly string _tag;
+        private readonly string _resultsOutputFilePath;
+
+        internal string ResultsOutputFilePath => _resultsOutputFilePath;
+
+        private static string GetConfiguresResultsFile(Config config)
+        {
+            if (config.IsNull(ConfigKeys.CUCUMBERPRO_RESULTS_FILE))
+                return null;
+
+            var fileName = Environment.ExpandEnvironmentVariables(config.GetString(ConfigKeys.CUCUMBERPRO_RESULTS_FILE));
+            var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath) ??
+                                 Directory.GetCurrentDirectory(); // in the very rare case the assembly folder cannot be detected, we use current directory
+
+            return Path.Combine(assemblyFolder, fileName);
+        }
 
         public HttpSingleJsonResultsPublisher(Config config, ILogger logger) : this(
             logger,
@@ -32,11 +49,12 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             config.GetInteger(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT),
             config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REVISION),
             config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_BRANCH) ? null : config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH),
-            config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_TAG) ? null : config.GetString(ConfigKeys.CUCUMBERPRO_GIT_TAG))
+            config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_TAG) ? null : config.GetString(ConfigKeys.CUCUMBERPRO_GIT_TAG),
+            GetConfiguresResultsFile(config))
         {
         }
 
-        public HttpSingleJsonResultsPublisher(ILogger logger, string url, string token, int timeoutMilliseconds, string revision, string branch, string tag)
+        public HttpSingleJsonResultsPublisher(ILogger logger, string url, string token, int timeoutMilliseconds, string revision, string branch, string tag, string resultsOutputFilePath = null)
         {
             _url = url;
             _token = token;
@@ -45,6 +63,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             _revision = revision;
             _branch = branch;
             _tag = tag;
+            _resultsOutputFilePath = resultsOutputFilePath;
         }
 
         private bool IsSupportedScheme(Uri uri)
@@ -100,8 +119,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
                 httpClient.Timeout = TimeSpan.FromMilliseconds(_timeoutMilliseconds);
                 SetupAuthorization(httpClient);
 
-                var content = new StringContent(GetSingleJsonContent(resultsJson, env, profileName),
-                    Encoding.UTF8, CONTENT_TYPE_SPECFLOW_RESULTS_JSON);
+                var jsonContent = GetSingleJsonContent(resultsJson, env, profileName);
+                LogJsonContent(jsonContent);
+                var content = new StringContent(jsonContent, Encoding.UTF8, CONTENT_TYPE_SPECFLOW_RESULTS_JSON);
 
                 DumpDebugInfo(content);
 
@@ -131,6 +151,15 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             catch (Exception ex)
             {
                 _logger?.Log(TraceLevel.Error, "Unexpected error while publishing results to Cucumber Pro: " + ex);
+            }
+        }
+
+        private void LogJsonContent(string jsonContent)
+        {
+            if (_resultsOutputFilePath != null)
+            {
+                _logger.Log(TraceLevel.Info, $"Saving Cucumber Pro results file to '{_resultsOutputFilePath}'.");
+                File.WriteAllText(_resultsOutputFilePath, jsonContent);
             }
         }
 

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using BoDi;
 using Cucumber.Pro.SpecFlowPlugin.Configuration;
 using Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings;
@@ -24,10 +22,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
         private IDictionary<string, string> _envToSend;
         private IResultsPublisher _resultsPublisher;
         private string _profile;
-        private string _resultsOutputFilePath;
         private bool _shouldPublish = false;
-
-        internal string ResultsOutputFilePath => _resultsOutputFilePath;
 
         public JsonReporter(IObjectContainer objectContainer)
         {
@@ -63,7 +58,6 @@ namespace Cucumber.Pro.SpecFlowPlugin
 
             VerifyConfig(config, systemEnv);
 
-            ConfigureResultsFile(config, logger);
             ConfigureGitRepositoryRoot(config, logger);
             ConfigureEnvToSend(config, envFilter, systemEnv);
             ConfigureProfile(config);
@@ -89,19 +83,6 @@ namespace Cucumber.Pro.SpecFlowPlugin
                 return;
             }
             logger.Log(TraceLevel.Info, $"Cucumber Pro plugin detected CI environment as '{ciEnvironmentResolver.CiName}'");
-        }
-
-        private void ConfigureResultsFile(Config config, ILogger logger)
-        {
-            if (config.IsNull(ConfigKeys.CUCUMBERPRO_RESULTS_FILE))
-                return;
-
-            var fileName = Environment.ExpandEnvironmentVariables(config.GetString(ConfigKeys.CUCUMBERPRO_RESULTS_FILE));
-            var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath) ??
-                Directory.GetCurrentDirectory(); // in the very rare case the assembly folder cannot be detected, we use current directory
-
-            _resultsOutputFilePath = Path.Combine(assemblyFolder, fileName);
-            logger.Log(TraceLevel.Info, $"Saving Cucumber Pro results file to '{_resultsOutputFilePath}'.");
         }
 
         private void ConfigureGitRepositoryRoot(Config config, ILogger logger)
@@ -149,13 +130,6 @@ namespace Cucumber.Pro.SpecFlowPlugin
                 return;
 
             var featureResults = _jsonFormatter.FeatureResults.ToList();
-
-            if (_resultsOutputFilePath != null)
-            {
-                var jsonContent = _jsonFormatter.GetJson(_logger.Level >= TraceLevel.Verbose);
-                File.WriteAllText(_resultsOutputFilePath, jsonContent);
-            }
-
             _resultsPublisher.PublishResults(featureResults, _envToSend, _profile);
         }
     }

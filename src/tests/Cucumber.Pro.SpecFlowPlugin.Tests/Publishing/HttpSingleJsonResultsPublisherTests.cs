@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Cucumber.Pro.SpecFlowPlugin.Configuration;
+using Cucumber.Pro.SpecFlowPlugin.Events;
 using Cucumber.Pro.SpecFlowPlugin.Publishing;
 using Nancy;
 using Nancy.Bootstrapper;
@@ -64,7 +66,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
         private const string SampleProjectName = "prj";
         private const string SampleBranch = "master";
         private const string SampleRevision = "rev1";
+        private string OutputFile = null;
         private readonly StubTraceListener stubTraceListener;
+        private HttpSingleJsonResultsPublisher Publisher;
 
         public HttpSingleJsonResultsPublisherTests(ITestOutputHelper testOutputHelper)
         {
@@ -81,13 +85,17 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             {
                 nancyHost.Start();
 
-                var publisher = publisherFactory != null ? publisherFactory() :
-                    new HttpSingleJsonResultsPublisher(stubTraceListener.Logger, url: SampleUrl, token: SampleToken, timeoutMilliseconds: timeout, revision: SampleRevision, branch: SampleBranch, tag: null);
-                publisher.PublishResultsFromContent(SampleJson, SampleEnv, SampleProfileName);
+                Publisher = publisherFactory != null ? publisherFactory() : CreatePublisher(timeout);
+                Publisher.PublishResultsFromContent(SampleJson, SampleEnv, SampleProfileName);
             }
 
             if (checkInvoked)
                 Assert.True(CProStubNancyModule.IsInvoked);
+        }
+
+        private HttpSingleJsonResultsPublisher CreatePublisher(int timeout = 5000)
+        {
+            return new HttpSingleJsonResultsPublisher(stubTraceListener.Logger, url: SampleUrl, token: SampleToken, timeoutMilliseconds: timeout, revision: SampleRevision, branch: SampleBranch, tag: null, resultsOutputFilePath: OutputFile);
         }
 
         [Fact]
@@ -207,12 +215,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
         [Fact]
         public void Can_read_from_config()
         {
-            var config = ConfigKeys.CreateDefaultConfig();
-            config.Set(ConfigKeys.CUCUMBERPRO_URL, "http://localhost:8082/");
-            config.Set(ConfigKeys.CUCUMBERPRO_PROJECTNAME, SampleProjectName);
-            config.Set(ConfigKeys.CUCUMBERPRO_GIT_REVISION, SampleRevision);
-            config.Set(ConfigKeys.CUCUMBERPRO_TOKEN, SampleToken);
-            config.Set(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT, 5000);
+            var config = CreateConfig();
 
             CProStubNancyModule.Reset();
             PublishResultsToStub(() => new HttpSingleJsonResultsPublisher(config, stubTraceListener.Logger));
@@ -221,6 +224,60 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             AssertSampleEnvInJson();
             AssertFeatureResultsInJson();
             AssertRevisionInJson();
+        }
+
+        private Config CreateConfig()
+        {
+            var config = ConfigKeys.CreateDefaultConfig();
+            config.Set(ConfigKeys.CUCUMBERPRO_URL, "http://localhost:8082/");
+            config.Set(ConfigKeys.CUCUMBERPRO_PROJECTNAME, SampleProjectName);
+            config.Set(ConfigKeys.CUCUMBERPRO_GIT_REVISION, SampleRevision);
+            config.Set(ConfigKeys.CUCUMBERPRO_TOKEN, SampleToken);
+            config.Set(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT, 5000);
+            if (OutputFile != null)
+                config.Set(ConfigKeys.CUCUMBERPRO_RESULTS_FILE, OutputFile);
+            return config;
+        }
+
+        [Fact]
+        public void Saves_results_file_if_configured()
+        {
+            var tempFile = Path.GetTempFileName() + ".json";
+            OutputFile = tempFile;
+
+            CProStubNancyModule.Reset();
+            PublishResultsToStub();
+            Assert.Equal(SampleProjectName, CProStubNancyModule.ProjectName);
+            AssertFeatureResultsInJson();
+
+            Assert.NotNull(Publisher.ResultsOutputFilePath);
+            Assert.True(File.Exists(tempFile));
+            File.Delete(tempFile);
+        }
+
+        [Fact]
+        public void Environment_variables_can_be_used_for_output_file()
+        {
+            var outFileSpec = @"%TEMP%\test.json";
+            OutputFile = outFileSpec;
+
+            Publisher = new HttpSingleJsonResultsPublisher(CreateConfig(), stubTraceListener.Logger);
+
+            var expectedFilePath = Environment.ExpandEnvironmentVariables(outFileSpec);
+            Assert.Equal(expectedFilePath, Publisher.ResultsOutputFilePath);
+        }
+
+        [Fact]
+        public void Output_file_is_relative_to_the_test_assembly()
+        {
+            var outFileSpec = @"foo\test.json";
+            OutputFile = outFileSpec;
+
+            Publisher = new HttpSingleJsonResultsPublisher(CreateConfig(), stubTraceListener.Logger);
+
+            var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+            var expectedFilePath = Path.Combine(assemblyFolder, outFileSpec);
+            Assert.Equal(expectedFilePath, Publisher.ResultsOutputFilePath);
         }
     }
 }

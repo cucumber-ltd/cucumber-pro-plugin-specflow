@@ -179,50 +179,5 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
                     It.IsAny<string>()),
                 Times.Never);
         }
-
-        [Fact]
-        public void Saves_results_file_if_configured()
-        {
-            var reporter = new JsonReporter(null);
-            var config = CreateUsualConfig();
-            var tempFile = Path.GetTempFileName() + ".json";
-            config.Set(ConfigKeys.CUCUMBERPRO_RESULTS_FILE, tempFile);
-
-            InitializeReporter(reporter, config);
-            reporter.OnTestRunFinished(new TestRunFinishedEvent());
-
-            Assert.NotNull(reporter.ResultsOutputFilePath);
-            Assert.True(File.Exists(tempFile));
-            File.Delete(tempFile);
-        }
-
-        [Fact]
-        public void Environment_variables_can_be_used_for_output_file()
-        {
-            var reporter = new JsonReporter(null);
-            var config = CreateUsualConfig();
-            var outFileSpec = @"%TEMP%\test.json";
-            config.Set(ConfigKeys.CUCUMBERPRO_RESULTS_FILE, outFileSpec);
-
-            InitializeReporter(reporter, config);
-
-            var expectedFilePath = Environment.ExpandEnvironmentVariables(outFileSpec);
-            Assert.Equal(expectedFilePath, reporter.ResultsOutputFilePath);
-        }
-
-        [Fact]
-        public void Output_file_is_relative_to_the_test_assembly()
-        {
-            var reporter = new JsonReporter(null);
-            var config = CreateUsualConfig();
-            var outFileSpec = @"foo\test.json";
-            config.Set(ConfigKeys.CUCUMBERPRO_RESULTS_FILE, outFileSpec);
-
-            InitializeReporter(reporter, config);
-
-            var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
-            var expectedFilePath = Path.Combine(assemblyFolder, outFileSpec);
-            Assert.Equal(expectedFilePath, reporter.ResultsOutputFilePath);
-        }
     }
 }

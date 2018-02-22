@@ -35,7 +35,7 @@
     [x] How to specify GIT COMMIT (SHA) and BRANCH locally
     [ ] Remove explicit opt-in for local publishing
     [x] Use BUILD_SOURCEVERSION for TFS for revision
-    [ ] Fix file saving - save entire json message
+    [x] Fix file saving - save entire json message
     [ ] Remove smoke test token from code - move it to CI config
     [x] make profile name as a top level config setting
     [x] make info as default log level
