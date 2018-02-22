@@ -17,7 +17,6 @@ namespace Cucumber.Pro.SpecFlowPlugin
     public class JsonReporter : IFormatter
     {
         private const string DEFAULT_PROFILE = "default";
-        private const string GIT_BRANCH_SEND = "GIT_BRANCH";
 
         private readonly IObjectContainer _objectContainer;
         private ILogger _logger;
@@ -76,8 +75,6 @@ namespace Cucumber.Pro.SpecFlowPlugin
         {
             if (config.IsNull(ConfigKeys.CUCUMBERPRO_PROJECTNAME))
                 throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Try to set the config value {ConfigKeys.CUCUMBERPRO_PROJECTNAME} or the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_PROJECTNAME)}");
-            if (!systemEnv.ContainsKey(GIT_BRANCH_SEND) && config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_BRANCH))
-                throw new ConfigurationErrorsException($"Unable to detect git branch for publishing results to Cucumber Pro. Set the environment variable {ConfigKeys.GetEnvVarName(ConfigKeys.CUCUMBERPRO_GIT_BRANCH)}");
         }
 
         private void DetectCiEnvironmentSettings(Config config, IDictionary<string, string> systemEnv, ILogger logger)
@@ -120,13 +117,6 @@ namespace Cucumber.Pro.SpecFlowPlugin
         private void ConfigureEnvToSend(Config config, EnvFilter envFilter, IDictionary<string, string> systemEnv)
         {
             _envToSend = envFilter.Filter(systemEnv);
-            if (!_envToSend.ContainsKey(GIT_BRANCH_SEND))
-            {
-                // we have verified already that it should be either in the system env or in the config
-                _envToSend[GIT_BRANCH_SEND] = systemEnv.ContainsKey(GIT_BRANCH_SEND)
-                    ? systemEnv[GIT_BRANCH_SEND]
-                    : config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH);
-            }
         }
 
         private void ConfigureProfile(Config config)

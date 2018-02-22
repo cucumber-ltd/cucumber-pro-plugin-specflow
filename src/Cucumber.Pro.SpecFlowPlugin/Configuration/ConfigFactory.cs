@@ -21,14 +21,6 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
             Path.GetFullPath(Environment.GetEnvironmentVariable("HOMEPATH"))
         };
 
-        public static readonly string[] LOCAL_YAML_FOLDERS = {
-            Path.Combine("..", "..", "..", ".."),
-            Path.Combine("..", "..", ".."),
-            Path.Combine("..", ".."),
-            "..",
-            "."
-        };
-
         private static IEnumerable<string> GetFoldersUp()
         {
             var testFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath) ??
