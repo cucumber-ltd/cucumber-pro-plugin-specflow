@@ -4,9 +4,9 @@
   # out sensitive values that should not be sent to Cucumber Pro.
   envmask: SECRET|KEY|TOKEN|PASSWORD|PWD
 
-  # Sets the log level to one of `DEBUG`, `INFO`, `WARN`, `ERROR` or `FATAL`. Defaults to `WARN`.
+  # Sets the log level to one of `DEBUG`, `INFO`, `WARN`, `ERROR` or `FATAL`. Defaults to `INFO`.
   # Setting it to `DEBUG` will also print the current configuration when the plugin runs.
-  logging: warn
+  logging: 
 
   # Not needed if the build is running on a preferred CI server and the Cucumber Pro project 
   # name is identical to the CI server project name. Define this environment variable to override 

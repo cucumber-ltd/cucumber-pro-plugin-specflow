@@ -6,6 +6,8 @@ namespace Cucumber.Pro.SpecFlowPlugin
 {
     public class Logger : ILogger
     {
+        private const TraceLevel DefaultLogLevel = TraceLevel.Info;
+
         private readonly ITraceListener _traceListener;
         public TraceLevel Level { get; }
 
@@ -29,7 +31,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
         private static TraceLevel GetLogLevel(Config config)
         {
             if (config.IsNull(ConfigKeys.CUCUMBERPRO_LOGGING))
-                return TraceLevel.Warning;
+                return DefaultLogLevel;
             switch (config.GetString(ConfigKeys.CUCUMBERPRO_LOGGING).ToLowerInvariant())
             {
                 case "debug":
@@ -46,7 +48,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
                 case "off":
                     return TraceLevel.Off;
             }
-            return TraceLevel.Warning;
+            return DefaultLogLevel;
         }
     }
 }
