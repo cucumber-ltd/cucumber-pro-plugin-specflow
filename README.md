@@ -5,9 +5,7 @@
 # TODO
 
     [x] Handle results on tags (instead of branches)
-    [ ] Publish through a separate tool -- later
     [x] Configure profile
-    [ ] Allow specifying custom config file -- not needed
     [x] Only publish on CI, except forced
     [x] Automated smoke test
     [x] NuGet package
@@ -15,7 +13,7 @@
     [x] TFS Support
     [x] Demo project
     [x] Verbose logging
-    [ ] Demo
+    [x] Demo
     [x] Support scenario outlines
     [x] Support undefined/skipped/pending(?) result
     [x] Support background(?)
@@ -23,13 +21,13 @@
     [x] Support step timings
     [x] Support parallel run
     [x] Convert feature file paths to relative
-    [ ] readme.txt of the NuGet package
-    [ ] icon, texts, etc of NuGet package
     [x] Configure results.json file
     [x] Use temp results.json file by default
+    [x] Build NuGet from CI
+    [ ] readme.txt of the NuGet package
+    [ ] icon, texts, etc of NuGet package
     [ ] TFS Build Line++ issue
     [ ] Replace Cucumber.Java with SpecFlow content type
-    [x] Build NuGet from CI
     [ ] Change error message about GIT BRANCH setting, it should only recommend ENV
     [ ] Why is it working without sending SHA
     [ ] How to specify GIT COMMIT (SHA) and BRANCH locally
@@ -40,17 +38,18 @@
     [ ] make info as default log level
     [ ] use config file w/o . by default, but allow one with . as well
     [ ] add json samples to cucumber-json-testdata-generator
+    [ ] make INFO as default log level
+    [ ] Cannot override file-based config setting with ENV -> change precedence
+    [ ] Document release process
 
 # Questions
 
-+ How to configure profile (now: from config file) -> OK
-+ Should we use INFO as default log level? -> OK
-- How to configure the case, when you want to publish the results to a file, but not send them up?
-+ Setting cucumberpro.connection.ignoreerror cannot be applied -> OK
-+ Cannot override file-based config setting with ENV -> change precedence
-+ How to release, how to release prelim versions?
-+ Max length for error message, entire json? -> not now
-+ Skip publishing for pull requests? -> will be handled on the server
+# Differences from the Java Plugin
+
+- Profile can be configured from the config file (and not at the plugin configuration)
+- Default log level is INFO
+- Setting cucumberpro.connection.ignoreerror is not used (the event where SpecFlow sends the messages swallowes the errors anyway)
+- Environment variables have precedence over the config file settings (in order to be override them from build config)
 
 # Known Issues
 
@@ -59,3 +58,9 @@
 - No line number for undefined steps
 - Line number for Scenario Outline examples is pointing to the SO header line, type="scenario"
 - Hook errors are not captured
+
+# Ideas for later improvements
+
+* Publish through a separate tool
+* Allow specifying custom config file
+* Publish results to a file, but not send them to CPro
