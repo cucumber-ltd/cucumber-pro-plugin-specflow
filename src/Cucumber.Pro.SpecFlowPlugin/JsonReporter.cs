@@ -79,7 +79,7 @@ namespace Cucumber.Pro.SpecFlowPlugin
             if (!ciEnvironmentResolver.IsDetected && !IsForcePublish(config))
             {
                 _shouldPublish = false;
-                logger.Log(TraceLevel.Info, $"Cucumber Pro plugin detected no CI environment and local publishing is not configured ({ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH}) -- skip publishing for this test run");
+                logger.Log(TraceLevel.Info, $"Cucumber Pro plugin detected no CI environment and local publishing is not configured (GIT_COMMIT or GIT_BRANCH is not specified) -- skip publishing for this test run");
                 return;
             }
             logger.Log(TraceLevel.Info, $"Cucumber Pro plugin detected CI environment as '{ciEnvironmentResolver.CiName}'");
@@ -109,8 +109,8 @@ namespace Cucumber.Pro.SpecFlowPlugin
 
         private static bool IsForcePublish(Config config)
         {
-            return !config.IsNull(ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH) &&
-                config.GetBoolean(ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH);
+            return !config.IsNull(ConfigKeys.CUCUMBERPRO_TESTING_FORCEPUBLISH) &&
+                config.GetBoolean(ConfigKeys.CUCUMBERPRO_TESTING_FORCEPUBLISH);
         }
 
         public void SetEventPublisher(IEventPublisher publisher)

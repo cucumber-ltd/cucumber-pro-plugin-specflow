@@ -36,15 +36,15 @@
     [x] use config file w/o . by default, but allow one with . as well
     [x] make INFO as default log level
     [x] Cannot override file-based config setting with ENV -> change precedence
-    [ ] readme.txt of the NuGet package
+    [x] readme.txt of the NuGet package
+    [x] Remove explicit opt-in for local publishing
+    [x] Add basic documentation
     [ ] icon, texts, etc of NuGet package
     [ ] TFS Build Line++ issue
-    [ ] Remove explicit opt-in for local publishing
     [ ] Remove smoke test token from code - move it to CI config
     [ ] Replace Cucumber.Java with SpecFlow content type
     [ ] Document release process
     [ ] add json samples to cucumber-json-testdata-generator
-    [x] Add basic documentation
 
 # Questions
 

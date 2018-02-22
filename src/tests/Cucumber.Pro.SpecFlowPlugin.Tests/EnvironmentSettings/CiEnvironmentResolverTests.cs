@@ -20,6 +20,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             };
         }
 
+        public static Dictionary<string, string> GetConfiguredLocalEnv() => GetJenkinsEnv();
+
         public static Dictionary<string, string> GetCircleEnv()
         {
             return new Dictionary<string, string>

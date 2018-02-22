@@ -55,19 +55,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
             var config = ConfigKeys.CreateDefaultConfig();
             config.Set(ConfigKeys.CUCUMBERPRO_GIT_BRANCH, "branch1");
             config.Set(ConfigKeys.CUCUMBERPRO_PROJECTNAME, "myproject");
-            config.Set(ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH, true);
+            config.Set(ConfigKeys.CUCUMBERPRO_TESTING_FORCEPUBLISH, true);
             return config;
-        }
-
-        [Fact]
-        public void Throws_when_branch_cannot_be_detected()
-        {
-            var reporter = new JsonReporter(null);
-            var config = CreateUsualConfig();
-            config.SetNull(ConfigKeys.CUCUMBERPRO_GIT_BRANCH);
-
-            Assert.Throws<ConfigurationErrorsException>(() =>
-                InitializeReporter(reporter, config));
         }
 
         [Fact]
@@ -79,21 +68,6 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
 
             Assert.Throws<ConfigurationErrorsException>(() =>
                 InitializeReporter(reporter, config));
-        }
-
-        [Fact]
-        public void Sets_git_branch()
-        {
-            var reporter = new JsonReporter(null);
-            var config = CreateUsualConfig();
-
-            InitializeReporter(reporter, config);
-            reporter.OnTestRunFinished(new TestRunFinishedEvent());
-
-            _resultsPublisherMock.Verify(p =>
-                p.PublishResults(It.IsAny<List<FeatureResult>>(),
-                It.Is((IDictionary<string, string> env) => env.ContainsKey("GIT_BRANCH")),
-                It.IsAny<string>()));
         }
 
         [Fact]
@@ -133,7 +107,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
         {
             var reporter = new JsonReporter(null);
             var config = CreateUsualConfig();
-            config.SetNull(ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH);
+            config.SetNull(ConfigKeys.CUCUMBERPRO_TESTING_FORCEPUBLISH);
             _env = CiEnvironmentResolverTests.GetJenkinsEnv();
 
             InitializeReporter(reporter, config);
@@ -150,7 +124,23 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
         {
             var reporter = new JsonReporter(null);
             var config = CreateUsualConfig();
-            config.Set(ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH, true);
+            _env = CiEnvironmentResolverTests.GetConfiguredLocalEnv();
+
+            InitializeReporter(reporter, config);
+            reporter.OnTestRunFinished(new TestRunFinishedEvent());
+
+            _resultsPublisherMock.Verify(p =>
+                p.PublishResults(It.IsAny<List<FeatureResult>>(),
+                    It.IsAny<IDictionary<string, string>>(),
+                    It.IsAny<string>()));
+        }
+
+        [Fact]
+        public void Publishes_on_local_when_forced()
+        {
+            var reporter = new JsonReporter(null);
+            var config = CreateUsualConfig();
+            config.Set(ConfigKeys.CUCUMBERPRO_TESTING_FORCEPUBLISH, true);
             _env = new Dictionary<string, string>(); // simulate local
 
             InitializeReporter(reporter, config);
@@ -167,7 +157,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
         {
             var reporter = new JsonReporter(null);
             var config = CreateUsualConfig();
-            config.SetNull(ConfigKeys.CUCUMBERPRO_RESULTS_PUBLISH);
+            config.SetNull(ConfigKeys.CUCUMBERPRO_TESTING_FORCEPUBLISH);
             _env = new Dictionary<string, string>(); // simulate local
 
             InitializeReporter(reporter, config);

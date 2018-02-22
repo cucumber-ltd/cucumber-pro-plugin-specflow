@@ -73,7 +73,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
                 DetectJenkins(env) ??
                 DetectTravis(env) ??
                 DetectTfs(env) ??
-                CreateLocal(env);
+                DetectLocal(env) ??
+                CreateUnknown(env);
         }
 
         private static string GetOrNull(IDictionary<string, string> env, string key)
@@ -157,7 +158,18 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
             return vaules == null ? null : new CiEnvironmentResolver("TFS", vaules);
         }
 
-        private static CiEnvironmentResolver CreateLocal(IDictionary<string, string> env)
+        private static CiEnvironmentResolver DetectLocal(IDictionary<string, string> env)
+        {
+            var vaules = GetEnvValues(env,
+                "GIT_COMMIT",
+                "GIT_BRANCH",
+                null, //project name
+                null, // repo root
+                "GIT_TAG");
+            return vaules == null ? null : new CiEnvironmentResolver("Local", vaules);
+        }
+
+        private static CiEnvironmentResolver CreateUnknown(IDictionary<string, string> env)
         {
             return new CiEnvironmentResolver(null, "local" + DateTime.Now.ToString("yyyyMMddhhmmss"), null, null, null, null);
         }

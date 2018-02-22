@@ -36,12 +36,6 @@
     timeout: 5000
 
   results:
-    # Whether or not to publish results to Cucumber Pro. Normally you should *not* provide
-    # a value for this setting - the plugin automatically publishes if it detects it is running
-    # in a CI environment. We recommend setting this to true only if you are experimenting with
-    # the configuration locally.
-    publish:
-
     # Saves the test results JSON file to the specified file path. If omitted the results will be
     # published wihtout saving them to a file.
     # The file path can be absolute or relative to the test assembly. Environment variables can also

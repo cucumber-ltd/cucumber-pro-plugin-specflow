@@ -9,8 +9,10 @@
         public const string CUCUMBERPRO_LOGGING = "cucumberpro.logging";
         public const string CUCUMBERPRO_PROJECTNAME = "cucumberpro.projectname";
         public const string CUCUMBERPRO_PROFILE = "cucumberpro.profile";
-        public const string CUCUMBERPRO_RESULTS_PUBLISH = "cucumberpro.results.publish";
         public const string CUCUMBERPRO_RESULTS_FILE = "cucumberpro.results.file";
+
+        // for testing
+        public const string CUCUMBERPRO_TESTING_FORCEPUBLISH = "cucumberpro.testing.forcepublish";
 
         // resolved settings
         public const string CUCUMBERPRO_GIT_REVISION = "cucumberpro.git.revision";

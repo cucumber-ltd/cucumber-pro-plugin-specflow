@@ -3,15 +3,15 @@
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>Cucumber.Pro.SpecFlowPlugin</id>
     <version>1.0.0-localdev</version>
-    <title>Publish test results to Cucumber Pro</title>
+    <title>Publish test results from SpecFlow to Cucumber Pro</title>
     <authors>Cucumber Ltd</authors>
     <owners>Cucumber Ltd</owners>
     <description>SpecFlow plugin to publish test results to Cucumber Pro (https://cucumber.io/pro).</description>
     <summary>SpecFlow plugin to publish test results to Cucumber Pro (https://cucumber.io/pro).</summary>
     <!--<releaseNotes>See TODO</releaseNotes>-->
     <language>en-US</language>
-    <projectUrl>https://cucumber.io/pro</projectUrl>
-    <licenseUrl>https://cucumber.io/pro</licenseUrl>
+    <projectUrl>https://app.cucumber.pro/projects/cucumber-pro-plugin-specflow</projectUrl>
+    <!--<licenseUrl>TODO</licenseUrl>-->
     <!--<iconUrl>TODO</iconUrl>-->
     <copyright>Copyright © 2018 Cucumber Ltd</copyright>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

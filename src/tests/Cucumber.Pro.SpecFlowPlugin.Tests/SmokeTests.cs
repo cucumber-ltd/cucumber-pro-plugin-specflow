@@ -106,10 +106,13 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
         {
             _testOutputHelper = testOutputHelper;
 
-            Environment.SetEnvironmentVariable("CUCUMBERPRO_RESULTS_PUBLISH", null, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("CUCUMBERPRO_TESTING_FORCEPUBLISH", null, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_PROJECTNAME", null, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_GIT_BRANCH", null, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_TOKEN", null, EnvironmentVariableTarget.Process);
+
+            Environment.SetEnvironmentVariable("GIT_COMMIT", null, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("GIT_BRANCH", null, EnvironmentVariableTarget.Process);
         }
 
         private ITestRunner GetTestRunner()
@@ -128,11 +131,12 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
         [Fact]
         public void Publish_a_result_to_CPro_SaaS()
         {
-            Environment.SetEnvironmentVariable("CUCUMBERPRO_RESULTS_PUBLISH", "true", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_PROJECTNAME", "SpecSol_Test1", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("CUCUMBERPRO_GIT_BRANCH", "master", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_TOKEN", "fe3e1a5f27789a139a963ff56cddb00816c", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_LOGGING", "debug", EnvironmentVariableTarget.Process);
+
+            Environment.SetEnvironmentVariable("GIT_COMMIT", "sha", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("GIT_BRANCH", "master", EnvironmentVariableTarget.Process);
 
             var testRunner = GetTestRunner();
             RunScenario(testRunner);
