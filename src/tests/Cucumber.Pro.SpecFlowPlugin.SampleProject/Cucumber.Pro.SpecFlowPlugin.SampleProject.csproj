@@ -87,6 +87,7 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>EatingCucumbersWithBackground.feature.cs</LastGenOutput>
     </None>
+    <None Include="Features\README.md" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

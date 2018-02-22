@@ -44,7 +44,7 @@
     [ ] Replace Cucumber.Java with SpecFlow content type
     [ ] Document release process
     [ ] add json samples to cucumber-json-testdata-generator
-    [ ] Add basic documentation
+    [x] Add basic documentation
 
 # Questions
 
