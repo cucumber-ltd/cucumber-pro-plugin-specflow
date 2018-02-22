@@ -30,7 +30,7 @@
     [ ] TFS Build Line++ issue
     [x] Send revision as part of json
     [ ] Replace Cucumber.Java with SpecFlow content type
-    [ ] Change error message about GIT BRANCH setting, it should only recommend ENV
+    [x] Change error message about GIT BRANCH setting, it should only recommend ENV
     [ ] Why is it working without sending SHA
     [ ] How to specify GIT COMMIT (SHA) and BRANCH locally
     [ ] Remove explicit opt-in for local publishing
