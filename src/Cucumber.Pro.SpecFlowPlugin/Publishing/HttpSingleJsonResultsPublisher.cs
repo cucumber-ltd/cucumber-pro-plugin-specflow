@@ -27,6 +27,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
         private readonly string _branch;
         private readonly string _tag;
         private readonly string _resultsOutputFilePath;
+        private readonly bool _isDryRun;
 
         internal string ResultsOutputFilePath => _resultsOutputFilePath;
 
@@ -50,11 +51,12 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REVISION),
             config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_BRANCH) ? null : config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH),
             config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_TAG) ? null : config.GetString(ConfigKeys.CUCUMBERPRO_GIT_TAG),
-            GetConfiguresResultsFile(config))
+            GetConfiguresResultsFile(config),
+            !config.IsNull(ConfigKeys.CUCUMBERPRO_TESTING_DRYRUN) && config.GetBoolean(ConfigKeys.CUCUMBERPRO_TESTING_DRYRUN))
         {
         }
 
-        public HttpSingleJsonResultsPublisher(ILogger logger, string url, string token, int timeoutMilliseconds, string revision, string branch, string tag, string resultsOutputFilePath = null)
+        public HttpSingleJsonResultsPublisher(ILogger logger, string url, string token, int timeoutMilliseconds, string revision, string branch, string tag, string resultsOutputFilePath = null, bool isDryRun = false)
         {
             _url = url;
             _token = token;
@@ -64,6 +66,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             _branch = branch;
             _tag = tag;
             _resultsOutputFilePath = resultsOutputFilePath;
+            _isDryRun = isDryRun;
         }
 
         private bool IsSupportedScheme(Uri uri)
@@ -124,6 +127,13 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
                 var content = new StringContent(jsonContent, Encoding.UTF8, CONTENT_TYPE_SPECFLOW_RESULTS_JSON);
 
                 DumpDebugInfo(content);
+
+                if (_isDryRun)
+                {
+                    _logger?.Log(TraceLevel.Info, $"CPro: Simulated publishing enabled. No requests are made.");
+                    _logger?.Log(TraceLevel.Info, $"Published results to Cucumber Pro: {_url}");
+                    return;
+                }
 
                 var response = httpClient.PostAsync(urlUri, content).Result;
                 if (response.IsSuccessStatusCode)

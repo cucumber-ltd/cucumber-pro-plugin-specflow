@@ -13,6 +13,7 @@
 
         // for testing
         public const string CUCUMBERPRO_TESTING_FORCEPUBLISH = "cucumberpro.testing.forcepublish";
+        public const string CUCUMBERPRO_TESTING_DRYRUN = "cucumberpro.testing.dryrun";
 
         // resolved settings
         public const string CUCUMBERPRO_GIT_REVISION = "cucumberpro.git.revision";

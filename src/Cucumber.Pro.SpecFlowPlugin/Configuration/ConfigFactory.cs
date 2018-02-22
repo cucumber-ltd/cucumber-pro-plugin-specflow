@@ -18,7 +18,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
         };
 
         public static readonly string[] GLOBAL_YAML_FOLDERS = {
-            Path.GetFullPath(Environment.GetEnvironmentVariable("HOMEPATH"))
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
         };
 
         private static IEnumerable<string> GetFoldersUp()
@@ -38,6 +38,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
         {
             foreach (var folder in folders)
             {
+                if (string.IsNullOrEmpty(folder))
+                    continue;
+
                 foreach (var fileName in CONFIG_FILE_NAMES)
                 {
                     var filePath = Path.GetFullPath(Path.Combine(folder, fileName));
