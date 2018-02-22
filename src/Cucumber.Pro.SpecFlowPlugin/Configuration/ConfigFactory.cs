@@ -1,34 +1,61 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Cucumber.Pro.SpecFlowPlugin.Configuration.Loaders;
 
 namespace Cucumber.Pro.SpecFlowPlugin.Configuration
 {
     public class ConfigFactory
     {
-        public const string CONFIG_FILE_NAME = ".cucumberpro.yml";
+        public const string CONFIG_FILE_NAME = "cucumberpro.yml";
+        public const string ALT_CONFIG_FILE_NAME = ".cucumberpro.yml";
 
-        public static readonly string[] GLOBAL_YAML_FILE_NAMES = {
-            Path.Combine(Environment.GetEnvironmentVariable("HOMEPATH"), CONFIG_FILE_NAME)
+        public static readonly string[] CONFIG_FILE_NAMES = {
+            CONFIG_FILE_NAME,
+            ALT_CONFIG_FILE_NAME
         };
 
-        public static readonly string[] LOCAL_YAML_FILE_NAMES = {
-            Path.Combine("..", "..", CONFIG_FILE_NAME),
-            Path.Combine("..", CONFIG_FILE_NAME),
-            CONFIG_FILE_NAME
+        public static readonly string[] GLOBAL_YAML_FOLDERS = {
+            Path.GetFullPath(Environment.GetEnvironmentVariable("HOMEPATH"))
         };
 
+        public static readonly string[] LOCAL_YAML_FOLDERS = {
+            Path.Combine("..", "..", "..", ".."),
+            Path.Combine("..", "..", ".."),
+            Path.Combine("..", ".."),
+            "..",
+            "."
+        };
 
-        private static void LoadYamlConfigFiles(string[] filePaths, Config config)
+        private static IEnumerable<string> GetFoldersUp()
         {
-            foreach (var filePath in filePaths)
+            var testFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath) ??
+                             Directory.GetCurrentDirectory();
+
+            var directory = new DirectoryInfo(testFolder);
+            while (directory != null)
             {
-                if (File.Exists(filePath))
+                yield return directory.FullName;
+                directory = directory.Parent;
+            }
+        }
+
+        private static void LoadYamlConfigFiles(IEnumerable<string> folders, Config config)
+        {
+            foreach (var folder in folders)
+            {
+                foreach (var fileName in CONFIG_FILE_NAMES)
                 {
-                    using (var reader = File.OpenText(filePath))
+                    var filePath = Path.GetFullPath(Path.Combine(folder, fileName));
+                    if (File.Exists(filePath))
                     {
-                        var loader = new YamlConfigLoader(reader);
-                        loader.Load(config);
+                        using (var reader = File.OpenText(filePath))
+                        {
+                            var loader = new YamlConfigLoader(reader);
+                            loader.Load(config);
+                        }
                     }
                 }
             }
@@ -41,12 +68,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
             // The order is defined by "globalness". The principle is to make it easy
             // to define global values, but equally easy to override them on a per-project
             // basis.
-            LoadYamlConfigFiles(GLOBAL_YAML_FILE_NAMES, config);
+            LoadYamlConfigFiles(GLOBAL_YAML_FOLDERS, config);
             new EnvironmentVariablesConfigLoader().Load(config);
-            //new BambooEnvironmentVariablesConfigLoader().Load(config);
-            //new DeprecatedEnvironmentVariablesConfigLoader().Load(config);
-            //new SystemPropertiesConfigLoader().Load(config);
-            LoadYamlConfigFiles(LOCAL_YAML_FILE_NAMES, config);
+            LoadYamlConfigFiles(GetFoldersUp(), config);
 
             return config;
         }

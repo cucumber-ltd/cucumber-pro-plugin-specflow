@@ -16,7 +16,7 @@
       <targetFolder>Cucumber.Pro.SpecFlowPlugin\content</targetFolder>
     </additionalFiles>
 
-    <additionalFiles Include="$(MSBuildThisFileDirectory)\.cucumberpro.yml">
+    <additionalFiles Include="$(MSBuildThisFileDirectory)\cucumberpro.yml">
       <targetFolder>Cucumber.Pro.SpecFlowPlugin\content</targetFolder>
     </additionalFiles>
   </ItemGroup>

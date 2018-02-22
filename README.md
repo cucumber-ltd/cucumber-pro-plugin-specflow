@@ -38,7 +38,7 @@
     [ ] Remove smoke test token from code - move it to CI config
     [x] make profile name as a top level config setting
     [x] make info as default log level
-    [ ] use config file w/o . by default, but allow one with . as well
+    [x] use config file w/o . by default, but allow one with . as well
     [ ] add json samples to cucumber-json-testdata-generator
     [ ] make INFO as default log level
     [ ] Cannot override file-based config setting with ENV -> change precedence
