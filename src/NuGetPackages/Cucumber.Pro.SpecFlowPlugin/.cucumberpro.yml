@@ -13,6 +13,11 @@
   # the project name.
   projectname: 
 
+  # Sets the execution profile for publishing the results. If omitted the value "default" is used.
+  # When the same tests are executed in different configuration, you should override the profile name
+  # by setting the `CUCUMBERPRO_PROFILE` environment variable on the build server.
+  profile:
+
   # (This configuration can be skipped for private Cucumber Pro appliance installations where results publishing is open).
   # Results are published to Cucumber Pro using HTTP/HTTPS. Each Cucumber Pro project has a token for this purpose.
   # You can find it in the project settings (press `?` to display it).
@@ -43,5 +48,3 @@
     # be used with the syntax: %TEMP%\results.json.
     file:
 
-    # Sets the execution profile for publishing the results. If omitted the value "default" is used.
-    profile:

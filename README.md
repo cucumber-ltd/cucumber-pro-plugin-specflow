@@ -36,7 +36,7 @@
     [ ] Remove explicit opt-in for local publishing
     [x] Use BUILD_SOURCEVERSION for TFS for revision
     [ ] Remove smoke test token from code - move it to CI config
-    [ ] make profile name as a top level config setting
+    [x] make profile name as a top level config setting
     [ ] make info as default log level
     [ ] use config file w/o . by default, but allow one with . as well
     [ ] add json samples to cucumber-json-testdata-generator
