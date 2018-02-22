@@ -24,26 +24,26 @@
     [x] Configure results.json file
     [x] Use temp results.json file by default
     [x] Build NuGet from CI
-    [ ] readme.txt of the NuGet package
-    [ ] icon, texts, etc of NuGet package
     [x] Use single json generator
-    [ ] TFS Build Line++ issue
     [x] Send revision as part of json
-    [ ] Replace Cucumber.Java with SpecFlow content type
     [x] Change error message about GIT BRANCH setting, it should only recommend ENV
     [x] Why is it working without sending SHA
     [x] How to specify GIT COMMIT (SHA) and BRANCH locally
-    [ ] Remove explicit opt-in for local publishing
     [x] Use BUILD_SOURCEVERSION for TFS for revision
     [x] Fix file saving - save entire json message
-    [ ] Remove smoke test token from code - move it to CI config
     [x] make profile name as a top level config setting
     [x] make info as default log level
     [x] use config file w/o . by default, but allow one with . as well
-    [ ] add json samples to cucumber-json-testdata-generator
     [x] make INFO as default log level
     [x] Cannot override file-based config setting with ENV -> change precedence
+    [ ] readme.txt of the NuGet package
+    [ ] icon, texts, etc of NuGet package
+    [ ] TFS Build Line++ issue
+    [ ] Remove explicit opt-in for local publishing
+    [ ] Remove smoke test token from code - move it to CI config
+    [ ] Replace Cucumber.Java with SpecFlow content type
     [ ] Document release process
+    [ ] add json samples to cucumber-json-testdata-generator
     [ ] Add basic documentation
 
 # Questions
