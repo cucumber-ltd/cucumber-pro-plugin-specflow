@@ -28,13 +28,13 @@
     [ ] icon, texts, etc of NuGet package
     [x] Use single json generator
     [ ] TFS Build Line++ issue
-    [ ] Send revision as ENV
+    [x] Send revision as part of json
     [ ] Replace Cucumber.Java with SpecFlow content type
     [ ] Change error message about GIT BRANCH setting, it should only recommend ENV
     [ ] Why is it working without sending SHA
     [ ] How to specify GIT COMMIT (SHA) and BRANCH locally
     [ ] Remove explicit opt-in for local publishing
-    [ ] Use BUILD_SOURCEVERSION for TFS for revision
+    [x] Use BUILD_SOURCEVERSION for TFS for revision
     [ ] Remove smoke test token from code - move it to CI config
     [ ] make profile name as a top level config setting
     [ ] make info as default log level

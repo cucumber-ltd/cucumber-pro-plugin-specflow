@@ -30,6 +30,16 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             };
         }
 
+        public static Dictionary<string, string> GetTfsEnv()
+        {
+            return new Dictionary<string, string>
+            {
+                { "BUILD_SOURCEVERSION", "rev1"},
+                { "BUILD_SOURCEBRANCHNAME", "branch1"},
+                { "SYSTEM_TEAMPROJECT", "myproject"},
+            };
+        }
+
         public static Dictionary<string, string> GetTravisEnv()
         {
             return new Dictionary<string, string>
@@ -117,5 +127,19 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
 
             Assert.StartsWith("local20", config.GetString(ConfigKeys.CUCUMBERPRO_REVISION));
         }
+
+        [Fact]
+        public void Can_resolve_config_from_tfs()
+        {
+            var resolver = CiEnvironmentResolver.Detect(GetTfsEnv());
+
+            var config = ConfigKeys.CreateDefaultConfig();
+            resolver.Resolve(config);
+
+            Assert.Equal("myproject", config.GetString(ConfigKeys.CUCUMBERPRO_PROJECTNAME));
+            Assert.Equal("rev1", config.GetString(ConfigKeys.CUCUMBERPRO_REVISION));
+            Assert.Equal("branch1", config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH));
+        }
+
     }
 }

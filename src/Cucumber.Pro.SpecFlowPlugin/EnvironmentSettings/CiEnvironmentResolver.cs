@@ -149,7 +149,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
         private static CiEnvironmentResolver DetectTfs(IDictionary<string, string> env)
         {
             var vaules = GetEnvValues(env,
-                "BUILD_BUILDNUMBER",
+                "BUILD_SOURCEVERSION",
                 "BUILD_SOURCEBRANCHNAME",
                 "SYSTEM_TEAMPROJECT",
                 "BUILD_REPOSITORY_LOCALPATH",
