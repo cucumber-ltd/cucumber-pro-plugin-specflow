@@ -14,7 +14,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
         public static string BuildCucumberProUrl(Config config, string projectName, string revision)
         {
             var cucumberProUrl = GetCucumberProUrl(config);
-            return $"{cucumberProUrl}tests/results/{projectName}/{revision}";
+            return $"{cucumberProUrl}tests/results/{projectName}";
         }
 
         private static String GetCucumberProUrl(Config config)

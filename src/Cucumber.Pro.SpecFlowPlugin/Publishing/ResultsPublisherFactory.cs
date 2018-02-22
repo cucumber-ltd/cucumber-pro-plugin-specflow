@@ -7,7 +7,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
     {
         public IResultsPublisher Create(Config config, ILogger logger)
         {
-            return new HttpMultipartResultsPublisher(config, logger);
+            return new HttpSingleJsonResultsPublisher(config, logger);
         }
     }
 }

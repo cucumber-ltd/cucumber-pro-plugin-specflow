@@ -5,8 +5,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using BoDi;
+using Cucumber.Pro.SpecFlowPlugin.Formatters;
 using Cucumber.Pro.SpecFlowPlugin.Tests.Publishing;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Bindings;
 using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Infrastructure;
 using TechTalk.SpecFlow.Plugins;
@@ -43,6 +45,28 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
 
     public class SmokeTests
     {
+        class StubFeatureFileLocationProvider : IFeatureFileLocationProvider
+        {
+            private int _stepLine;
+
+            public string GetFeatureFilePath(FeatureContext featureContext)
+            {
+                return "src/tests/Cucumber.Pro.SpecFlowPlugin.SampleProject/Features/EatingCucumbers.feature";
+            }
+
+            public int? GetScenarioLine(ScenarioContext scenarioContext)
+            {
+                _stepLine = 10;
+                return 10;
+            }
+
+
+            public int? GetStepLine(StepInstance stepInstance)
+            {
+                return ++_stepLine;
+            }
+        }
+
         class SmokeTestConfigurationProvider : IRuntimeConfigurationProvider
         {
             public SpecFlowConfiguration LoadConfiguration(SpecFlowConfiguration specFlowConfiguration)
@@ -94,6 +118,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
             var containerBuilder = new ContainerBuilder(new SmokeTestDependencyProvider(_smokeTestTraceListener));
             var smokeTestConfigurationProvider = new SmokeTestConfigurationProvider();
             var globalContainer = containerBuilder.CreateGlobalContainer(smokeTestConfigurationProvider);
+            globalContainer.RegisterTypeAs<StubFeatureFileLocationProvider, IFeatureFileLocationProvider>();
             var testRunnerManager = globalContainer.Resolve<ITestRunnerManager>();
             testRunnerManager.Initialize(Assembly.GetExecutingAssembly());
             var testRunner = testRunnerManager.GetTestRunner(0);

@@ -26,7 +26,9 @@
     [x] Build NuGet from CI
     [ ] readme.txt of the NuGet package
     [ ] icon, texts, etc of NuGet package
+    [*] Use single json generator
     [ ] TFS Build Line++ issue
+    [ ] Send revision as ENV
     [ ] Replace Cucumber.Java with SpecFlow content type
     [ ] Change error message about GIT BRANCH setting, it should only recommend ENV
     [ ] Why is it working without sending SHA
