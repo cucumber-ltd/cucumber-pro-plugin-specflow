@@ -30,7 +30,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
             CucumberProResultsUrlBuilder.BuildCucumberProUrl(config),
             config.GetString(ConfigKeys.CUCUMBERPRO_TOKEN),
             config.GetInteger(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT),
-            config.GetString(ConfigKeys.CUCUMBERPRO_REVISION),
+            config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REVISION),
             config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_BRANCH) ? null : config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH),
             config.IsNull(ConfigKeys.CUCUMBERPRO_GIT_TAG) ? null : config.GetString(ConfigKeys.CUCUMBERPRO_GIT_TAG))
         {

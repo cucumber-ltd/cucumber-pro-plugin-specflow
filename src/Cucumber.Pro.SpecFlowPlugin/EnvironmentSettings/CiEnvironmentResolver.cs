@@ -36,7 +36,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
 
         public void Resolve(Config config)
         {
-            SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_REVISION, _revision);
+            SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_GIT_REVISION, _revision);
             SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_GIT_BRANCH, _branch);
             SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_GIT_TAG, _tag);
             SetIfNotSet(config, ConfigKeys.CUCUMBERPRO_PROJECTNAME, _projectName);

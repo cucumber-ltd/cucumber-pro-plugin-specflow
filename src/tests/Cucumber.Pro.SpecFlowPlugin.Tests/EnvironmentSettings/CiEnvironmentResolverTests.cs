@@ -69,7 +69,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             var config = ConfigKeys.CreateDefaultConfig();
             resolver.Resolve(config);
 
-            Assert.Equal("rev1", config.GetString(ConfigKeys.CUCUMBERPRO_REVISION));
+            Assert.Equal("rev1", config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REVISION));
         }
 
         [Fact]
@@ -125,7 +125,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             var config = ConfigKeys.CreateDefaultConfig();
             resolver.Resolve(config);
 
-            Assert.StartsWith("local20", config.GetString(ConfigKeys.CUCUMBERPRO_REVISION));
+            Assert.StartsWith("local20", config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REVISION));
         }
 
         [Fact]
@@ -137,7 +137,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
             resolver.Resolve(config);
 
             Assert.Equal("myproject", config.GetString(ConfigKeys.CUCUMBERPRO_PROJECTNAME));
-            Assert.Equal("rev1", config.GetString(ConfigKeys.CUCUMBERPRO_REVISION));
+            Assert.Equal("rev1", config.GetString(ConfigKeys.CUCUMBERPRO_GIT_REVISION));
             Assert.Equal("branch1", config.GetString(ConfigKeys.CUCUMBERPRO_GIT_BRANCH));
         }
 

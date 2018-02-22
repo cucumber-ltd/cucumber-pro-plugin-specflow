@@ -210,7 +210,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
             var config = ConfigKeys.CreateDefaultConfig();
             config.Set(ConfigKeys.CUCUMBERPRO_URL, "http://localhost:8082/");
             config.Set(ConfigKeys.CUCUMBERPRO_PROJECTNAME, SampleProjectName);
-            config.Set(ConfigKeys.CUCUMBERPRO_REVISION, SampleRevision);
+            config.Set(ConfigKeys.CUCUMBERPRO_GIT_REVISION, SampleRevision);
             config.Set(ConfigKeys.CUCUMBERPRO_TOKEN, SampleToken);
             config.Set(ConfigKeys.CUCUMBERPRO_CONNECTION_TIMEOUT, 5000);
 
