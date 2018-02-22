@@ -39,9 +39,9 @@
     [x] readme.txt of the NuGet package
     [x] Remove explicit opt-in for local publishing
     [x] Add basic documentation
+    [x] Remove smoke test token from code - move it to CI config
     [ ] icon, texts, etc of NuGet package
     [ ] TFS Build Line++ issue
-    [ ] Remove smoke test token from code - move it to CI config
     [ ] Replace Cucumber.Java with SpecFlow content type
     [ ] Document release process
     [ ] add json samples to cucumber-json-testdata-generator

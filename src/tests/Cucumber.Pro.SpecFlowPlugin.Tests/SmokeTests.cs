@@ -109,7 +109,6 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
             Environment.SetEnvironmentVariable("CUCUMBERPRO_TESTING_FORCEPUBLISH", null, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_PROJECTNAME", null, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_GIT_BRANCH", null, EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("CUCUMBERPRO_TOKEN", null, EnvironmentVariableTarget.Process);
 
             Environment.SetEnvironmentVariable("GIT_COMMIT", null, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("GIT_BRANCH", null, EnvironmentVariableTarget.Process);
@@ -131,8 +130,13 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
         [Fact]
         public void Publish_a_result_to_CPro_SaaS()
         {
-            Environment.SetEnvironmentVariable("CUCUMBERPRO_PROJECTNAME", "SpecSol_Test1", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("CUCUMBERPRO_TOKEN", "fe3e1a5f27789a139a963ff56cddb00816c", EnvironmentVariableTarget.Process);
+            if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CUCUMBERPRO_TOKEN")))
+            {
+                _testOutputHelper.WriteLine($"In order to run the smoke test, you need to set the CUCUMBERPRO_TOKEN environment variable");
+                return;
+            }
+
+            Environment.SetEnvironmentVariable("CUCUMBERPRO_PROJECTNAME", "cucumber-pro-plugin-specflow-test", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_LOGGING", "debug", EnvironmentVariableTarget.Process);
 
             Environment.SetEnvironmentVariable("GIT_COMMIT", "sha", EnvironmentVariableTarget.Process);

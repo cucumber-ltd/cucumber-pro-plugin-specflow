@@ -11,7 +11,7 @@
   # Not needed if the build is running on a preferred CI server and the Cucumber Pro project 
   # name is identical to the CI server project name. Define this environment variable to override 
   # the project name.
-  projectname: SpecSol_Test1
+  projectname: cucumber-pro-plugin-specflow-test
 
   # (This configuration can be skipped for private Cucumber Pro appliance installations where results publishing is open).
   # Results are published to Cucumber Pro using HTTP/HTTPS. Each Cucumber Pro project has a token for this purpose.
@@ -20,7 +20,7 @@
   # Consult your CI server's documentation for details about defining per-project environment variables.
   # Some CI servers such as Travis and Circle CI allow you to define environment variables in a file checked into git.
   # *DO NOT DO THIS* - as it would allow anyone with read acceess to your repository to publish results.
-  token: fe3e1a5f27789a139a963ff56cddb00816c
+  token: 
 
   # Override this if you are using a privately hosted Cucumber Pro appliance.
   # We recommend setting this with a CUCUMBERPRO_URL environment variable defined globally on your build server.
