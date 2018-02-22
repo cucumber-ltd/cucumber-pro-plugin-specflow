@@ -40,8 +40,8 @@
     [x] make info as default log level
     [x] use config file w/o . by default, but allow one with . as well
     [ ] add json samples to cucumber-json-testdata-generator
-    [ ] make INFO as default log level
-    [ ] Cannot override file-based config setting with ENV -> change precedence
+    [x] make INFO as default log level
+    [x] Cannot override file-based config setting with ENV -> change precedence
     [ ] Document release process
 
 # Questions

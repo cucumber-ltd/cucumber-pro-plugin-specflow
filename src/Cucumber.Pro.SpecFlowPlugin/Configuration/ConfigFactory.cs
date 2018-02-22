@@ -69,8 +69,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
             // to define global values, but equally easy to override them on a per-project
             // basis.
             LoadYamlConfigFiles(GLOBAL_YAML_FOLDERS, config);
-            new EnvironmentVariablesConfigLoader().Load(config);
             LoadYamlConfigFiles(GetFoldersUp(), config);
+            new EnvironmentVariablesConfigLoader().Load(config);
 
             return config;
         }
