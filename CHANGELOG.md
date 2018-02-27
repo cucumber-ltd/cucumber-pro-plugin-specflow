@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+## [1.0.1] - 2018-02-27
+
+### Added
+
+* Log to file. Specify the log file with the `%CUCUMBERPRO_LOGFILE%` environment variable or `cucumberpro.logfile` YAML property.
+
 ## [1.0.0] - 2018-02-27
 
 ### Added
@@ -31,5 +37,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 First proper release!
 
-[Unreleased]: https://github.com/cucumber-ltd/cucumber-pro-plugin-specflow/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/cucumber-ltd/cucumber-pro-plugin-specflow/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/cucumber-ltd/cucumber-pro-plugin-specflow/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/cucumber-ltd/cucumber-pro-plugin-specflow/compare/v1.0.0-pre20180222b...v1.0.0
