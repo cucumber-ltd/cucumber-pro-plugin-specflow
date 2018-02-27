@@ -126,8 +126,13 @@ namespace Cucumber.Pro.SpecFlowPlugin
 
         internal void OnTestRunFinished(TestRunFinishedEvent e)
         {
+            _logger.Log(TraceLevel.Verbose, "CPro: OnTestRunFinished triggered");
+
             if (!_shouldPublish)
+            {
+                _logger.Log(TraceLevel.Verbose, "CPro: Publishing skipped");
                 return;
+            }
 
             var featureResults = _jsonFormatter.FeatureResults.ToList();
             _resultsPublisher.PublishResults(featureResults, _envToSend, _profile);
