@@ -136,7 +136,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests
                 return;
             }
 
-            Environment.SetEnvironmentVariable("CUCUMBERPRO_PROJECTNAME", "cucumber-pro-plugin-specflow-test", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("CUCUMBERPRO_PROJECTNAME", "cucumber-pro-plugin-specflow", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("CUCUMBERPRO_LOGGING", "debug", EnvironmentVariableTarget.Process);
 
             Environment.SetEnvironmentVariable("GIT_COMMIT", "sha", EnvironmentVariableTarget.Process);

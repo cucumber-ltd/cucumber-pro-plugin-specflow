@@ -11,7 +11,7 @@
   # Not needed if the build is running on a preferred CI server and the Cucumber Pro project 
   # name is identical to the CI server project name. Define this environment variable to override 
   # the project name.
-  projectname: cucumber-pro-plugin-specflow-test
+  projectname: cucumber-pro-plugin-specflow
 
   # (This configuration can be skipped for private Cucumber Pro appliance installations where results publishing is open).
   # Results are published to Cucumber Pro using HTTP/HTTPS. Each Cucumber Pro project has a token for this purpose.
