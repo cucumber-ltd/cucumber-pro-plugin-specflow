@@ -10,8 +10,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cucumber Ltd")]
 [assembly: AssemblyProduct("Cucumber.Pro.SpecFlowPlugin")]
-[assembly: AssemblyCopyright("Copyright © Cucumber Ltd 2018")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © Cucumber Ltd")]
+[assembly: AssemblyTrademark("Cucumber")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
