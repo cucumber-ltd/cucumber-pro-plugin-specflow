@@ -12,7 +12,7 @@
     <language>en-US</language>
     <projectUrl>https://app.cucumber.pro/projects/cucumber-pro-plugin-specflow</projectUrl>
     <!--<licenseUrl>TODO</licenseUrl>-->
-    <!--<iconUrl>TODO</iconUrl>-->
+    <iconUrl>https://github.com/cucumber-ltd/brand/raw/master/images/png/notm/cucumber-mark-purple/cucumber-mark-purple-64.png</iconUrl>
     <copyright>Copyright © Cucumber Ltd</copyright>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>specflow bdd cucumber cucumber.pro</tags>
