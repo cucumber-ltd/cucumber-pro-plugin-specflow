@@ -15,6 +15,7 @@ will be automatic.
 * Circle CI
 * Jenkins
 * Travis
+* Wercker
 
 ## Installation
 
@@ -53,6 +54,11 @@ cucumberpro:
   # Sets the log level to one of `DEBUG`, `INFO`, `WARN`, `ERROR` or `FATAL`. Defaults to `INFO`.
   # Setting it to `DEBUG` will also print the current configuration when the plugin runs.
   logging: 
+
+  # Writes out the log messages to the specified file. 
+  # The file path can be absolute or relative to the test assembly. Environment variables can also
+  # be used with the syntax: %TEMP%\results.json.
+  logfile:
 
   # Not needed if the build is running on a preferred CI server and the Cucumber Pro project 
   # name is identical to the CI server project name. Define this environment variable to override 
