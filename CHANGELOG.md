@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-* Publish results with content type `application/x.specflow.results+json`
+* Publish results with content type `application/x.cucumber.specflow.results+json`
 
 ### Deprecated
 

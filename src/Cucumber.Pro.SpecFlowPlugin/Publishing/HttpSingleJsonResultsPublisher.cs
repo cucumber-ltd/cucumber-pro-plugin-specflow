@@ -16,7 +16,7 @@ namespace Cucumber.Pro.SpecFlowPlugin.Publishing
 {
     public class HttpSingleJsonResultsPublisher : IResultsPublisher
     {
-        private const string CONTENT_TYPE_SPECFLOW_RESULTS_JSON = "application/x.specflow.results+json";
+        private const string CONTENT_TYPE_SPECFLOW_RESULTS_JSON = "application/x.cucumber.specflow.results+json";
 
         private readonly string _url;
         private readonly string _token;
