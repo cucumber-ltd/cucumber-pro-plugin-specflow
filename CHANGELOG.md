@@ -11,16 +11,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-* Publish results with content type `application/x.cucumber.specflow.results+json`
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
+## [1.0.0] - 2018-02-27
+
+### Added
+
+* Added logo to NuGet package
+
+### Changed
+
+* Publish results with content type `application/x.cucumber.specflow.results+json`
+
 ## 1.0.0-pre20180222b - 2018-02-26
 
 First proper release!
 
-[Unreleased]: https://github.com/cucumber-ltd/cucumber-pro-plugin-specflow/compare/1.0.0-pre20180222b...HEAD
+[Unreleased]: https://github.com/cucumber-ltd/cucumber-pro-plugin-specflow/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/cucumber-ltd/cucumber-pro-plugin-specflow/compare/v1.0.0-pre20180222b...v1.0.0
