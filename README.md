@@ -2,6 +2,10 @@
 
 [![Build status](https://cucumberbdd.visualstudio.com/_apis/public/build/definitions/3f6ffcb6-fe64-4a4f-85bd-eed3893f83fd/1/badge)](https://cucumberbdd.visualstudio.com/cucumber-pro-plugin-specflow/_build/index?context=mine&path=%5C&definitionId=1&_a=completed)
 
+# Run tests
+
+    mono packages/xunit.runner.console.2.3.1/tools/net452/xunit.console.exe tests/Cucumber.Pro.SpecFlowPlugin.Tests/bin/Debug/Cucumber.Pro.SpecFlowPlugin.Tests.dll
+
 # TODO
 
     [x] Handle results on tags (instead of branches)
@@ -45,7 +49,13 @@
     [ ] TFS Build Line++ issue
     [ ] Replace Cucumber.Java with SpecFlow content type
     [ ] Document release process
+    [ ] Support .NET Core (currently only .NET 4.6 is supported, which is what SpecFlow 2.3.0 supports)
     [ ] add json samples to cucumber-json-testdata-generator
+    [ ] CI build with multiple versions:
+      [ ] SpecFlow version (e.g. 2.2.1 and 2.3.0)
+      [ ] JSON.net version
+      [ ] Yaml version
+    [ ] Make tests run on OSX/Linux (currently fails with newline issues, and hangs)
 
 # Questions
 
