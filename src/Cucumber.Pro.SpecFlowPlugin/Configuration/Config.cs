@@ -133,14 +133,14 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
                 stringBuilder.Append(item.Key);
                 stringBuilder.Append(":");
                 stringBuilder.Append(item.Value.IsNull() ? "" : " " + item.Value.GetString());
-                stringBuilder.AppendLine();
+                stringBuilder.Append("\n");
             }
             foreach (var configItem in _configByProperty)
             {
                 stringBuilder.Append(indent);
                 stringBuilder.Append(configItem.Key);
                 stringBuilder.Append(":");
-                stringBuilder.AppendLine();
+                stringBuilder.Append("\n");
                 configItem.Value.AppendTo(stringBuilder, indent + "  ");
             }
         }

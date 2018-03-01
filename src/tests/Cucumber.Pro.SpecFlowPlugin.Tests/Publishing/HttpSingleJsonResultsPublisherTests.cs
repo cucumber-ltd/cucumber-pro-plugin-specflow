@@ -258,7 +258,17 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Publishing
         [Fact]
         public void Environment_variables_can_be_used_for_output_file()
         {
-            var outFileSpec = @"%TEMP%\test.json";
+            string outFileSpec;
+            var pid = Environment.OSVersion.Platform;
+            if(pid == PlatformID.MacOSX || pid == PlatformID.Unix) 
+            {
+                Environment.SetEnvironmentVariable("SOME_ABSOLUTE_DIR_PATH", "/foo");
+                outFileSpec = @"%SOME_ABSOLUTE_DIR_PATH%\test.json";
+            } 
+            else 
+            {
+                outFileSpec = @"%TEMP%\test.json";
+            }
             OutputFile = outFileSpec;
 
             Publisher = new HttpSingleJsonResultsPublisher(CreateConfig(), stubTraceListener.Logger);

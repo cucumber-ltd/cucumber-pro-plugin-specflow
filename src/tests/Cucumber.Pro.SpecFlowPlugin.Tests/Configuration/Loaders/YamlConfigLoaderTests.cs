@@ -38,17 +38,17 @@ cucumber:
         {
             var config = new Config();
             new YamlConfigLoader(new StringReader("" +
-                                                  "cucumberpro:\r\n" +
-                                                  "  one: un\r\n")).Load(config);
+                                                  "cucumberpro:\n" +
+                                                  "  one: un\n")).Load(config);
 
             new YamlConfigLoader(new StringReader("" +
-                                                  "cucumberpro:\r\n" +
-                                                  "  two: deux\r\n")).Load(config);
+                                                  "cucumberpro:\n" +
+                                                  "  two: deux\n")).Load(config);
 
             var yaml = "" +
-                          "cucumberpro:\r\n" +
-                          "  one: un\r\n" +
-                          "  two: deux\r\n";
+                          "cucumberpro:\n" +
+                          "  one: un\n" +
+                          "  two: deux\n";
             Assert.Equal(yaml, config.ToString());
 
         }
@@ -57,27 +57,27 @@ cucumber:
         public void roundtrips()
         {
             var yaml = "" +
-                          "cucumberpro:\r\n" +
-                          "  cucumberprofile: cucumber-jvm-unspecified-profile\r\n" +
-                          "  envmask: SECRET|KEY|TOKEN|PASSWORD\r\n" +
-                          "  logging: debug\r\n" +
-                          "  url: https://app.cucumber.pro/\r\n" +
-                          "  connection:\r\n" +
-                          "    ignoreerror: true\r\n" +
-                          "    timeout: 5000\r\n" +
-                          "  git:\r\n" +
-                          "    hostkey:\r\n" +
-                          "    hostname: git.cucumber.pro\r\n" +
-                          "    publish: false\r\n" +
-                          "    sshport: 22\r\n" +
-                          "    source:\r\n" +
-                          "      fetch: true\r\n" +
-                          "      remote: origin\r\n" +
-                          "  project:\r\n" +
-                          "    name:\r\n" +
-                          "  results:\r\n" +
-                          "    publish:\r\n" +
-                          "    token:\r\n";
+                          "cucumberpro:\n" +
+                          "  cucumberprofile: cucumber-jvm-unspecified-profile\n" +
+                          "  envmask: SECRET|KEY|TOKEN|PASSWORD\n" +
+                          "  logging: debug\n" +
+                          "  url: https://app.cucumber.pro/\n" +
+                          "  connection:\n" +
+                          "    ignoreerror: true\n" +
+                          "    timeout: 5000\n" +
+                          "  git:\n" +
+                          "    hostkey:\n" +
+                          "    hostname: git.cucumber.pro\n" +
+                          "    publish: false\n" +
+                          "    sshport: 22\n" +
+                          "    source:\n" +
+                          "      fetch: true\n" +
+                          "      remote: origin\n" +
+                          "  project:\n" +
+                          "    name:\n" +
+                          "  results:\n" +
+                          "    publish:\n" +
+                          "    token:\n";
 
             var config = new Config();
             var configLoader = new YamlConfigLoader(new StringReader(yaml));
