@@ -75,15 +75,16 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.Configuration
             config.Set("a.d.e", "4");
 
             const string expected = "" +
-                "b:\n" +
+                "a:\n" +
+                "  b:\n" +
+                "    c:\n" +
+                "      d:\n" +
+                "        e: 1\n" +
                 "  c:\n" +
                 "    d:\n" +
-                "      e: 1\n" +
-                "c:\n" +
+                "      e: 3\n" +
                 "  d:\n" +
-                "    e: 3\n" +
-                "d:\n" +
-                "  e: 4\n";
+                "    e: 4\n";
             Assert.Equal(expected, config.ToString());
         }
     }

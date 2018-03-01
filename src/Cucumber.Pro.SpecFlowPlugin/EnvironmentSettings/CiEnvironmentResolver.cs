@@ -167,14 +167,14 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
             var vaules = GetEnvValues(env,
                 "WERCKER_GIT_COMMIT",
                 "WERCKER_GIT_BRANCH",
-                "TRAVIS_REPO_SLUG",
-                "TRAVIS_BUILD_DIR", // repo root
-                "TRAVIS_TAG"); // tag name
+                "WERCKER_GIT_REPOSITORY", // project name
+                "WERCKER_ROOT", // repo root
+                null); // tag name
             if (vaules == null)
                 return null;
             var projectRepoSlug = vaules.Item3;
             var projectName = projectRepoSlug?.Split('/').Last();
-            return new CiEnvironmentResolver("Travis", vaules.Item1, vaules.Item2, projectName, vaules.Item4, vaules.Item5);
+            return new CiEnvironmentResolver("Wercker", vaules.Item1, vaules.Item2, projectName, vaules.Item4, vaules.Item5);
         }
 
         private static CiEnvironmentResolver DetectLocal(IDictionary<string, string> env)

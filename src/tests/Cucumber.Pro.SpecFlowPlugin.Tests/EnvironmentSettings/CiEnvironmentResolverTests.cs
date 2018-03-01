@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Cucumber.Pro.SpecFlowPlugin.Configuration;
 using Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings;
 using Xunit;
@@ -11,16 +7,15 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
 {
     public class CiEnvironmentResolverTests
     {
-        public static Dictionary<string, string> GetJenkinsEnv()
+        public static Dictionary<string, string> GetBambooEnv()
         {
             return new Dictionary<string, string>
             {
-                { "GIT_COMMIT", "rev1"},
-                { "GIT_BRANCH", "branch1"}
+                { "bamboo_planRepository_revision", "rev1"},
+                { "bamboo_repository_git_branch", "branch1"},
+                { "bamboo_planRepository_name", "myproject"}
             };
         }
-
-        public static Dictionary<string, string> GetConfiguredLocalEnv() => GetJenkinsEnv();
 
         public static Dictionary<string, string> GetCircleEnv()
         {
@@ -29,6 +24,15 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
                 { "CIRCLE_SHA1", "rev1"},
                 { "CIRCLE_BRANCH", "branch1"},
                 { "CIRCLE_PROJECT_REPONAME", "myproject"},
+            };
+        }
+
+        public static Dictionary<string, string> GetJenkinsEnv()
+        {
+            return new Dictionary<string, string>
+            {
+                { "GIT_COMMIT", "rev1"},
+                { "GIT_BRANCH", "branch1"}
             };
         }
 
@@ -51,6 +55,18 @@ namespace Cucumber.Pro.SpecFlowPlugin.Tests.EnvironmentSettings
                 { "TRAVIS_REPO_SLUG", "owner/myproject"},
             };
         }
+
+        public static Dictionary<string, string> GetWerckerEnv()
+        {
+            return new Dictionary<string, string>
+            {
+                { "WERCKER_GIT_COMMIT", "rev1"},
+                { "WERCKER_GIT_BRANCH", "branch1"},
+                { "WERCKER_GIT_REPOSITORY", "myproject"},
+            };
+        }
+
+        public static Dictionary<string, string> GetConfiguredLocalEnv() => GetJenkinsEnv();
 
         [Fact]
         public void Can_resolve_branch()
