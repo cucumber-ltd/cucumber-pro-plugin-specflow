@@ -4,6 +4,8 @@
 
 # Run tests
 
+    cd src
+    msbuild
     mono packages/xunit.runner.console.2.3.1/tools/net452/xunit.console.exe tests/Cucumber.Pro.SpecFlowPlugin.Tests/bin/Debug/Cucumber.Pro.SpecFlowPlugin.Tests.dll
 
 # TODO

@@ -71,8 +71,9 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
                 DetectBamboo(env) ??
                 DetectCircle(env) ??
                 DetectJenkins(env) ??
-                DetectTravis(env) ??
                 DetectTfs(env) ??
+                DetectTravis(env) ??
+                DetectWercker(env) ??
                 DetectLocal(env) ??
                 CreateUnknown(env);
         }
@@ -119,6 +120,8 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
             return vaules == null ? null : new CiEnvironmentResolver("Circle", vaules);
         }
 
+        // https://wiki.jenkins.io/display/JENKINS/Git+Plugin#GitPlugin-Environmentvariables
+        // https://wiki.jenkins.io/display/JENKINS/Git+Tag+Message+Plugin
         private static CiEnvironmentResolver DetectJenkins(IDictionary<string, string> env)
         {
             var vaules = GetEnvValues(env,
@@ -128,6 +131,18 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
                 null, // repo root
                 "GIT_TAG_NAME"); 
             return vaules == null ? null : new CiEnvironmentResolver("Jenkins", vaules);
+        }
+
+        // https://docs.microsoft.com/en-us/vsts/build-release/concepts/definitions/build/variables?tabs=batch#predefined-variables
+        private static CiEnvironmentResolver DetectTfs(IDictionary<string, string> env)
+        {
+            var vaules = GetEnvValues(env,
+                "BUILD_SOURCEVERSION",
+                "BUILD_SOURCEBRANCHNAME",
+                "SYSTEM_TEAMPROJECT",
+                "BUILD_REPOSITORY_LOCALPATH",
+                null); // tag name
+            return vaules == null ? null : new CiEnvironmentResolver("TFS", vaules);
         }
 
         // https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables
@@ -146,16 +161,20 @@ namespace Cucumber.Pro.SpecFlowPlugin.EnvironmentSettings
             return new CiEnvironmentResolver("Travis", vaules.Item1, vaules.Item2, projectName, vaules.Item4, vaules.Item5);
         }
 
-        // https://docs.microsoft.com/en-us/vsts/build-release/concepts/definitions/build/variables?tabs=batch#predefined-variables
-        private static CiEnvironmentResolver DetectTfs(IDictionary<string, string> env)
+        // http://devcenter.wercker.com/docs/environment-variables/available-env-vars
+        private static CiEnvironmentResolver DetectWercker(IDictionary<string, string> env)
         {
             var vaules = GetEnvValues(env,
-                "BUILD_SOURCEVERSION",
-                "BUILD_SOURCEBRANCHNAME",
-                "SYSTEM_TEAMPROJECT",
-                "BUILD_REPOSITORY_LOCALPATH",
-                null); // tag name
-            return vaules == null ? null : new CiEnvironmentResolver("TFS", vaules);
+                "WERCKER_GIT_COMMIT",
+                "WERCKER_GIT_BRANCH",
+                "TRAVIS_REPO_SLUG",
+                "TRAVIS_BUILD_DIR", // repo root
+                "TRAVIS_TAG"); // tag name
+            if (vaules == null)
+                return null;
+            var projectRepoSlug = vaules.Item3;
+            var projectName = projectRepoSlug?.Split('/').Last();
+            return new CiEnvironmentResolver("Travis", vaules.Item1, vaules.Item2, projectName, vaules.Item4, vaules.Item5);
         }
 
         private static CiEnvironmentResolver DetectLocal(IDictionary<string, string> env)
