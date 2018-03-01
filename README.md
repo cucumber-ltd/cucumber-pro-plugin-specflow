@@ -64,9 +64,7 @@
 # Differences from the Java Plugin
 
 - Profile can be configured from the config file (and not at the plugin configuration)
-- Default log level is INFO
 - Setting cucumberpro.connection.ignoreerror is not used (the event where SpecFlow sends the messages swallowes the errors anyway)
-- Environment variables have precedence over the config file settings (in order to be override them from build config)
 
 # Known Issues
 
