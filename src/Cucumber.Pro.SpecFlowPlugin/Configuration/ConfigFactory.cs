@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using Cucumber.Pro.SpecFlowPlugin.Configuration.Loaders;
 
@@ -9,12 +8,12 @@ namespace Cucumber.Pro.SpecFlowPlugin.Configuration
 {
     public class ConfigFactory
     {
-        public const string CONFIG_FILE_NAME = "cucumberpro.yml";
-        public const string ALT_CONFIG_FILE_NAME = ".cucumberpro.yml";
-
         public static readonly string[] CONFIG_FILE_NAMES = {
-            CONFIG_FILE_NAME,
-            ALT_CONFIG_FILE_NAME
+            "C:\\cucumber\\cucumber.yml",
+            Path.Combine(Environment.SpecialFolder.Personal.ToString(), ".cucumber", "cucumber.yml"),
+            Path.Combine(Environment.SpecialFolder.Personal.ToString(), "cucumber.yml"),
+            "cucumber.yml",
+            Path.Combine(".cucumber", "cucumber.yml")
         };
 
         public static readonly string[] GLOBAL_YAML_FOLDERS = {
