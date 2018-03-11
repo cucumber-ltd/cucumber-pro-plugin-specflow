@@ -27,9 +27,13 @@ Press `OK`. When the build is finished there should be a new nuget package
 
 ## Tagging a release
 
-After you've made a successful release, update `CHANGELOG.md`. Commit your changes
-and create a tag in git:
+After you've made a successful release, update `CHANGELOG.md`:
+
+* Remove any empty sections for the released version. 
+* Update diff links at the bottom of the file.
+* Commit everything.
+
+Finally create a tag in git:
 
     git tag vX.Y.Z
-    git push --tags
-
+    git push && git push --tags
