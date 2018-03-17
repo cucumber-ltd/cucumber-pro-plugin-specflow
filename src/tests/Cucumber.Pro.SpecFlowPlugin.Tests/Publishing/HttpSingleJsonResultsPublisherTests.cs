@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Cucumber.Pro.SpecFlowPlugin.Configuration;
-using Cucumber.Pro.SpecFlowPlugin.Events;
 using Cucumber.Pro.SpecFlowPlugin.Publishing;
 using Nancy;
 using Nancy.Bootstrapper;

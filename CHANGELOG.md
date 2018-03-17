@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+* Properly URL-encode project names. This fixes a bug with project names that have `/` and other special characters.
+  See [cucumber-pro-plugin-jvm#28](https://github.com/cucumber-ltd/cucumber-pro-plugin-jvm/pull/28).
+
 ## [1.0.1] - 2018-02-27
 
 ### Added

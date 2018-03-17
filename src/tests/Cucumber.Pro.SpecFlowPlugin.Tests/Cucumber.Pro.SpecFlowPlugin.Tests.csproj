@@ -94,6 +94,7 @@
     <Compile Include="Publishing\HttpSingleJsonResultsPublisherTests.cs" />
     <Compile Include="Publishing\StubTraceListener.cs" />
     <Compile Include="SmokeTests.cs" />
+    <Compile Include="Publishing\CucumberProResultsUrlBuilderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
